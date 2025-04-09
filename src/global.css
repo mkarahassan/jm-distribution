@@ -1,0 +1,10 @@
+/* Global button click feedback */
+button {
+    transition: transform 0.1s ease, filter 0.2s ease;
+  }
+  
+  button:active {
+    transform: scale(0.95);
+    filter: brightness(0.9);
+  }
+  
