@@ -31,6 +31,7 @@ import CartIcon from './CartIcon';
 
 
 
+
 const Home = ({ addToCart }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -163,14 +164,19 @@ const Home = ({ addToCart }) => {
   });
 
   return (
-    <div style={{ padding: '2rem', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
+      {/* Sticky Panel */}
       <div style={{
         position: 'sticky',
         top: 0,
-        zIndex: 10,
+        zIndex: 50,
+        width: '100vw',
+        left: 0,
+        right: 0,
         background: '#1a1a1a',
-        width: '100%',
-        paddingBottom: '1rem'
+        padding: '1rem 1rem 0.5rem',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+        overflowX: 'hidden'
       }}>
         <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>JM Distribution</h1>
 
@@ -204,7 +210,8 @@ const Home = ({ addToCart }) => {
               msOverflowStyle: 'none',
               gap: '0.75rem',
               padding: '0.5rem',
-              touchAction: 'pan-x'
+              touchAction: 'pan-x',
+              maxWidth: '100vw'
             }}
             className="hide-scrollbar"
           >
@@ -218,6 +225,7 @@ const Home = ({ addToCart }) => {
         </div>
       </div>
 
+      {/* Product Grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(250px, 1fr))',
@@ -225,7 +233,8 @@ const Home = ({ addToCart }) => {
         justifyItems: 'center',
         width: '100%',
         maxWidth: '1200px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '1rem'
       }}>
         <AnimatePresence>
           {displayProducts.map(renderProductCard)}
@@ -235,7 +244,7 @@ const Home = ({ addToCart }) => {
   );
 };
 
-// Styles
+// Static Styles
 const badgeHot = {
   position: 'absolute',
   top: '10px',
@@ -654,7 +663,10 @@ function App() {
       <nav style={{
         padding: '1rem',
         background: '#000',
-        position: 'sticky',
+        width: '100vw', // full viewport width
+        left: 0,
+        right: 0,
+        position: 'flex',
         top: 0,
         zIndex: 1000,
         display: 'flex',
