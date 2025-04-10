@@ -171,11 +171,20 @@ const Admin = () => {
     <div style={{ padding: '2rem', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
       <h2>Admin Panel</h2>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <button onClick={() => setShowSection('add')} style={pillButtonStyle}>Add Product</button>
-        <button onClick={() => setShowSection('products')} style={pillButtonStyle}>View Products</button>
-        <button onClick={() => setShowSection('orders')} style={pillButtonStyle}>View Orders</button>
-      </div>
+      <div
+  style={{
+    marginBottom: '2rem',
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.75rem',
+    justifyContent: 'center',
+  }}
+>
+  <button onClick={() => setShowSection('add')} style={pillButtonStyle}>Add Product</button>
+  <button onClick={() => setShowSection('products')} style={pillButtonStyle}>View Products</button>
+  <button onClick={() => setShowSection('orders')} style={pillButtonStyle}>View Orders</button>
+</div>
+
 
 
       {showSection === 'add' && (

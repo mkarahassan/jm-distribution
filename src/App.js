@@ -26,35 +26,42 @@ import CartIcon from './CartIcon';
 
 
 
+
+
+
+
+
 const Home = ({ addToCart }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [quantities, setQuantities] = useState({});
-  const scrollRef = useRef();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [addedToCart, setAddedToCart] = useState({});
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const scrollRef = useRef();
 
   useEffect(() => {
     const fetchProducts = async () => {
       const querySnapshot = await getDocs(collection(db, 'products'));
-      const items = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       const sorted = items.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
       setProducts(sorted);
       const uniqueCategories = [...new Set(sorted.map(p => p.category))];
       setCategories(uniqueCategories);
-
       const initialQuantities = {};
       sorted.forEach(item => {
         initialQuantities[item.id] = 1;
       });
       setQuantities(initialQuantities);
     };
-
     fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 480);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleQuantityChange = (productId, value) => {
@@ -71,7 +78,9 @@ const Home = ({ addToCart }) => {
     fontWeight: 'bold',
     cursor: 'pointer',
     transition: 'all 0.2s ease-in-out',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    scrollSnapAlign: 'start'
   });
 
   const renderProductCard = (p) => (
@@ -96,85 +105,33 @@ const Home = ({ addToCart }) => {
         minHeight: '350px'
       }}
     >
-      {p.featured && (
-        <span style={{ position: 'absolute', top: '10px', right: '10px', background: '#ff4081', color: '#fff', padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px' }}>
-          Hot Item
-        </span>
+      {p.featured && <span style={badgeHot}>Hot Item</span>}
+      {!p.inStock && <span style={badgeSoldOut}>Sold Out</span>}
+      {p.image ? (
+        <img src={p.image} alt={p.name} style={productImage} />
+      ) : (
+        <div style={imageFiller} />
       )}
-      {!p.inStock && (
-        <span style={{ position: 'absolute', top: '10px', left: '10px', background: 'gray', color: '#fff', padding: '2px 6px', fontSize: '0.75rem', borderRadius: '4px' }}>
-          Sold Out
-        </span>
-      )}
-      {p.image && (
-        <img src={p.image} alt={p.name} style={{ width: '100%', height: '150px', objectFit: 'contain', marginBottom: '1rem' }} />
-      )}
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <h3 style={{ marginBottom: '0.25rem' }}>{p.name}</h3>
         <p style={{ marginBottom: '0.5rem' }}>${p.price.toFixed(2)}</p>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: '0.5rem',
-            gap: '0.5rem',
-            width: '100%',
-          }}
-        >
-          <button
-            onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) - 1)}
-            style={{
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              border: 'none',
-              background: '#ff4081',
-              color: '#fff',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              cursor: 'pointer'
-            }}
-          >-</button>
+        <div style={qtyContainer}>
+          <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) - 1)} style={qtyBtn}>-</button>
           <input
             type="number"
             min="1"
             value={quantities[p.id] || 1}
             onChange={(e) => handleQuantityChange(p.id, e.target.value)}
-            style={{
-              width: '40px',
-              textAlign: 'center',
-              borderRadius: '999px',
-              border: '1px solid #ccc',
-              padding: '0.25rem 0.5rem'
-            }}
+            style={qtyInput}
           />
-          <button
-            onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) + 1)}
-            style={{
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              border: 'none',
-              background: '#ff4081',
-              color: '#fff',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              cursor: 'pointer'
-            }}
-          >+</button>
+          <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) + 1)} style={qtyBtn}>+</button>
         </div>
         <button
           onClick={() => {
             addToCart({ ...p, quantity: quantities[p.id] || 1 });
             setAddedToCart(prev => ({ ...prev, [p.id]: true }));
-          
-            // Clear the message after 2 seconds
-            setTimeout(() => {
-              setAddedToCart(prev => ({ ...prev, [p.id]: false }));
-            }, 2000);
+            setTimeout(() => setAddedToCart(prev => ({ ...prev, [p.id]: false })), 2000);
           }}
-          
           disabled={!p.inStock}
           style={{
             marginTop: '0.5rem',
@@ -191,53 +148,79 @@ const Home = ({ addToCart }) => {
           {p.inStock ? 'Add to Cart' : 'Out of Stock'}
         </button>
         {addedToCart[p.id] && (
-  <div style={{ color: '#8bc34a', marginTop: '0.5rem', fontSize: '0.85rem' }}>
-    Added to cart!
-  </div>
-)}
-
+          <div style={{ color: '#8bc34a', marginTop: '0.5rem', fontSize: '0.85rem' }}>
+            Added to cart!
+          </div>
+        )}
       </div>
     </motion.div>
   );
 
-  const displayProducts = selectedCategory
-    ? products.filter(p => p.category === selectedCategory)
-    : products;
+  const displayProducts = products.filter(p => {
+    const matchCategory = selectedCategory ? p.category === selectedCategory : true;
+    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCategory && matchSearch;
+  });
 
   return (
     <div style={{ padding: '2rem', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'sticky', top: 0, background: '#1a1a1a', zIndex: 10, paddingBottom: '1rem' }}>
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        background: '#1a1a1a',
+        width: '100%',
+        paddingBottom: '1rem'
+      }}>
         <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>JM Distribution</h1>
-        <div
-          ref={scrollRef}
-          style={{
-            display: 'flex',
-            overflowX: 'auto',
-            gap: '0.75rem',
-            marginBottom: '1rem',
-            paddingBottom: '0.5rem',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}
-          onTouchStart={(e) => {
-            scrollRef.current.touchStartX = e.touches[0].clientX;
-          }}
-          onTouchMove={(e) => {
-            const deltaX = scrollRef.current.touchStartX - e.touches[0].clientX;
-            scrollRef.current.scrollLeft += deltaX;
-            scrollRef.current.touchStartX = e.touches[0].clientX;
-          }}
-        >
-          <button onClick={() => setSelectedCategory('')} style={buttonStyle(selectedCategory === '')}>All</button>
-          {categories.map(cat => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)} style={buttonStyle(selectedCategory === cat)}>{cat}</button>
-          ))}
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: isMobile ? '90%' : '400px',
+              padding: '0.5rem 1rem',
+              borderRadius: '9999px',
+              border: '1px solid #ccc',
+              fontSize: '1rem',
+              background: '#333',
+              color: '#fff'
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <div
+            ref={scrollRef}
+            style={{
+              display: 'inline-flex',
+              overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              gap: '0.75rem',
+              padding: '0.5rem',
+              touchAction: 'pan-x'
+            }}
+            className="hide-scrollbar"
+          >
+            <button onClick={() => setSelectedCategory('')} style={buttonStyle(selectedCategory === '')}>All</button>
+            {categories.map(cat => (
+              <button key={cat} onClick={() => setSelectedCategory(cat)} style={buttonStyle(selectedCategory === cat)}>
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(250px, 1fr))',
         gap: '1rem',
         justifyItems: 'center',
         width: '100%',
@@ -252,7 +235,73 @@ const Home = ({ addToCart }) => {
   );
 };
 
+// Styles
+const badgeHot = {
+  position: 'absolute',
+  top: '10px',
+  right: '10px',
+  background: '#ff4081',
+  color: '#fff',
+  padding: '2px 6px',
+  fontSize: '0.75rem',
+  borderRadius: '4px',
+  zIndex: 1
+};
 
+const badgeSoldOut = {
+  position: 'absolute',
+  top: '10px',
+  left: '10px',
+  background: 'gray',
+  color: '#fff',
+  padding: '2px 6px',
+  fontSize: '0.75rem',
+  borderRadius: '4px',
+  zIndex: 1
+};
+
+const productImage = {
+  width: '100%',
+  height: '150px',
+  objectFit: 'contain',
+  marginBottom: '1rem'
+};
+
+const imageFiller = {
+  width: '100%',
+  height: '150px',
+  marginBottom: '1rem',
+  visibility: 'hidden'
+};
+
+const qtyBtn = {
+  width: '30px',
+  height: '30px',
+  borderRadius: '50%',
+  border: 'none',
+  background: '#ff4081',
+  color: '#fff',
+  fontWeight: 'bold',
+  fontSize: '1rem',
+  cursor: 'pointer'
+};
+
+const qtyInput = {
+  width: '40px',
+  textAlign: 'center',
+  borderRadius: '999px',
+  border: '1px solid #ccc',
+  padding: '0.25rem 0.5rem'
+};
+
+const qtyContainer = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: '0.5rem',
+  gap: '0.5rem',
+  width: '100%'
+};
 
 
 
