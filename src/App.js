@@ -164,13 +164,12 @@ const Home = ({ addToCart }) => {
   });
 
   return (
-    <div style={{ background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
-      {/* Sticky Panel */}
+    <div style={{ background: '', minHeight: '100vh', width: '100%', color: '#fff', overflowX: 'hidden', boxSizing: 'border-box' }}>
       <div style={{
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
         zIndex: 50,
-        width: '100vw',
+        width: '100%',
         left: 0,
         right: 0,
         background: '#1a1a1a',
@@ -179,7 +178,6 @@ const Home = ({ addToCart }) => {
         overflowX: 'hidden'
       }}>
         <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>JM Distribution</h1>
-
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
           <input
             type="text"
@@ -197,7 +195,6 @@ const Home = ({ addToCart }) => {
             }}
           />
         </div>
-
         <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
           <div
             ref={scrollRef}
@@ -211,7 +208,8 @@ const Home = ({ addToCart }) => {
               gap: '0.75rem',
               padding: '0.5rem',
               touchAction: 'pan-x',
-              maxWidth: '100vw'
+              maxWidth: '100%',
+              boxSizing: 'border-box'
             }}
             className="hide-scrollbar"
           >
@@ -225,7 +223,6 @@ const Home = ({ addToCart }) => {
         </div>
       </div>
 
-      {/* Product Grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(250px, 1fr))',
@@ -234,7 +231,9 @@ const Home = ({ addToCart }) => {
         width: '100%',
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '1rem'
+        padding: '1rem',
+        boxSizing: 'border-box',
+        marginTop: '200px' // enough space under the fixed panel
       }}>
         <AnimatePresence>
           {displayProducts.map(renderProductCard)}
@@ -244,7 +243,6 @@ const Home = ({ addToCart }) => {
   );
 };
 
-// Static Styles
 const badgeHot = {
   position: 'absolute',
   top: '10px',
@@ -663,7 +661,7 @@ function App() {
       <nav style={{
         padding: '1rem',
         background: '#000',
-        width: '100vw', // full viewport width
+        width: '100%', // full viewport width
         left: 0,
         right: 0,
         position: 'fixed',
