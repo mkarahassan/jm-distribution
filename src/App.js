@@ -666,7 +666,7 @@ function App() {
         width: '100vw', // full viewport width
         left: 0,
         right: 0,
-        position: 'flex',
+        position: 'fixed',
         top: 0,
         zIndex: 1000,
         display: 'flex',
