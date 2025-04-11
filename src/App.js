@@ -173,28 +173,42 @@ const Home = ({ addToCart }) => {
         left: 0,
         right: 0,
         background: '#1a1a1a',
+        boxSizing: 'border-box',
         padding: '1rem 1rem 0.5rem',
         boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
-        overflowX: 'hidden'
+        overflow: 'visible'
       }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>JM Distribution</h1>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: isMobile ? '90%' : '400px',
-              padding: '0.5rem 1rem',
-              borderRadius: '9999px',
-              border: '1px solid #ccc',
-              fontSize: '1rem',
-              background: '#333',
-              color: '#fff'
-            }}
-          />
-        </div>
+        <h1 style={{ margin: 5, textAlign: 'center',marginTop: '60px', }}>JM Distribution</h1>
+        <p style={{ margin: 5, textAlign: 'center', fontSize: '0.9rem', color: '#ccc' }}>
+    Cell: (714) 362-6281
+  </p>
+        <div style={{
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '0 1rem',
+  boxSizing: 'border-box',
+  marginBottom: '1rem'
+}}>
+  <input
+    type="text"
+    placeholder="Search products..."
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    style={{
+      width: '100%',
+      maxWidth: '360px',
+      padding: '0.5rem 1rem',
+      borderRadius: '9999px',
+      border: '1px solid #ccc',
+      fontSize: '1rem',
+      background: '#333',
+      color: '#fff',
+      boxSizing: 'border-box'
+    }}
+  />
+</div>
+
         <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
           <div
             ref={scrollRef}
@@ -206,10 +220,11 @@ const Home = ({ addToCart }) => {
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
               gap: '0.75rem',
-              padding: '0.5rem',
+              padding: '0.5rem 0.5rem 0.5rem 0.5rem', // top right bottom left
+
               touchAction: 'pan-x',
               maxWidth: '100%',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
             }}
             className="hide-scrollbar"
           >
@@ -219,6 +234,7 @@ const Home = ({ addToCart }) => {
                 {cat}
               </button>
             ))}
+            <div style={{ minWidth: '0.5rem' }}></div>
           </div>
         </div>
       </div>
@@ -233,7 +249,7 @@ const Home = ({ addToCart }) => {
         margin: '0 auto',
         padding: '1rem',
         boxSizing: 'border-box',
-        marginTop: '200px' // enough space under the fixed panel
+        marginTop: '245px' // enough space under the fixed panel
       }}>
         <AnimatePresence>
           {displayProducts.map(renderProductCard)}
@@ -326,7 +342,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <div style={{ padding: '2rem', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ padding: '2rem', marginTop: '25px', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
       <h2>Your Cart</h2>
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
@@ -498,17 +514,34 @@ const Checkout = ({ cart, clearCart }) => {
 
   if (submitted) {
     return (
-      <div style={{ padding: '2rem' }}>
+      <div style={{ padding: '2rem', marginTop: '50px' }}>
         <h2>Order Placed!</h2>
-        <p>Thank you for your order. We'll contact you shortly.</p>
+        <p>Thank you for your order. </p>
+        <p1>For questions call: (714)362-6281.</p1>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>Checkout</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '400px' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',         // stack the header and form vertically
+      //justifyContent: 'center',        // center vertically
+      marginTop: "50px",
+      alignItems: 'center',            // center horizontally
+      padding: '2rem',
+      minHeight: '100vh',
+      background: '#1a1a1a',
+      boxSizing: 'border-box'
+    }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#fff' }}>Checkout</h2>
+      <form onSubmit={handleSubmit} style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        maxWidth: '700px',
+        boxSizing: 'border-box'
+      }}>
         <input placeholder="Store Name" value={storeName} onChange={e => setStoreName(e.target.value)} required style={inputStyle} />
         <input placeholder="Owner Name" value={ownerName} onChange={e => setOwnerName(e.target.value)} required style={inputStyle} />
         <input placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value)} required style={inputStyle} />
@@ -520,14 +553,18 @@ const Checkout = ({ cart, clearCart }) => {
         <button
           type="submit"
           style={{
-            marginTop: '1rem',
-            background: '#ff4081',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '999px',
-            padding: '0.75rem 1.5rem',
-            fontWeight: 'bold',
-            cursor: 'pointer'
+            width: '100%',                  // ✅ Matches input width
+        padding: '0.5rem 1rem',         // ✅ Same padding as inputs
+        borderRadius: '9999px',
+        border: '1px solid #ccc',       // ✅ Match input border look
+        background: '#ff4081',
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: '1rem',
+        marginTop: '1rem',
+        cursor: 'pointer',
+        marginLeft: '6px'
+
           }}
         >
           Place Order
@@ -659,19 +696,22 @@ function App() {
   return (
     <Router>
       <nav style={{
-        padding: '1rem',
-        background: '#000',
-        width: '100%', // full viewport width
-        left: 0,
-        right: 0,
-        position: 'fixed',
-        top: 0,
-        zIndex: 1000,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'nowrap'
-      }}>
+  padding: '0.9rem',
+  background: '#000',
+  width: '100%',
+  left: 0,
+  right: 0,
+  position: 'fixed',
+  top: 0,
+  zIndex: 1000,
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  flexWrap: 'nowrap',
+  boxSizing: 'border-box',
+  overflowX: 'hidden'
+}}>
+
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <Link to="/" style={navButtonStyle}>Home</Link>
           {user && <Link to="/admin" style={navButtonStyle}>Admin</Link>}

@@ -168,7 +168,7 @@ const Admin = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ padding: '2rem', marginTop: '25px', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
       <h2>Admin Panel</h2>
 
       <div
