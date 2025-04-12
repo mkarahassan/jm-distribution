@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "firebase": "^9.6.1",
     "framer-motion": "^12.6.3",
     "papaparse": "^5.5.2",

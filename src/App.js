@@ -23,6 +23,7 @@ import ProtectedRoute from './ProtectedRoute';
 
 import CartIcon from './CartIcon';
 
+import emailjs from '@emailjs/browser';
 
 
 
@@ -58,6 +59,10 @@ const Home = ({ addToCart }) => {
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedCategory]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 480);
@@ -495,6 +500,23 @@ const Checkout = ({ cart, clearCart }) => {
     };
 
     try {
+      // Send Email Notification
+emailjs.send('service_2z696qf', 'template_5ziebjl', {
+  store_name: storeName,
+  owner_name: ownerName,
+  phone,
+  address: `${street}, ${city}, ${state} ${zip}`,
+  total: calculateTotal(),
+  items: cart.map(item => `${item.name} x${item.quantity} - $${item.price.toFixed(2)}`).join('\n')
+}, '5YgacT8wW9cQ0ldnp').then(
+  (result) => {
+    console.log('Email sent:', result.text);
+  },
+  (error) => {
+    console.error('Email error:', error);
+  }
+);
+
       await addDoc(collection(db, "orders"), order);
       setSubmitted(true);
       clearCart();
@@ -714,14 +736,14 @@ function App() {
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <Link to="/" style={navButtonStyle}>Home</Link>
-          {user && <Link to="/admin" style={navButtonStyle}>Admin</Link>}
+          {user && <Link to="/admin" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Admin</Link>}
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <Link to="/cart" style={navButtonStyle}>
+          <Link to="/cart" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <CartIcon cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)} />
           </Link>
           {!user ? (
-            <Link to="/login" style={navButtonStyle}>Login</Link>
+            <Link to="/login" style={navButtonStyle}>Admin Login</Link>
           ) : (
             <button onClick={handleLogout} style={{ ...navButtonStyle, border: 'none', cursor: 'pointer' }}>Logout</button>
           )}
