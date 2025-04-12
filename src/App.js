@@ -42,12 +42,20 @@ const Home = ({ addToCart }) => {
   const [addedToCart, setAddedToCart] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const scrollRef = useRef();
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
       const querySnapshot = await getDocs(collection(db, 'products'));
       const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const sorted = items.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+      const sorted = items
+  .sort((a, b) => {
+    if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
+      return a.displayOrder - b.displayOrder;
+    }
+    return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
+  });
+
       setProducts(sorted);
       const uniqueCategories = [...new Set(sorted.map(p => p.category))];
       setCategories(uniqueCategories);
@@ -735,7 +743,7 @@ function App() {
 }}>
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <Link to="/" style={navButtonStyle}>Home</Link>
+          <Link to="/" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</Link>
           {user && <Link to="/admin" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Admin</Link>}
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>

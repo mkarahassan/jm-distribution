@@ -3,6 +3,8 @@ import { db, storage } from './firebase';
 import { collection, addDoc, serverTimestamp, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Papa from 'papaparse';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 
 const Admin = () => {
   const [products, setProducts] = useState([]);
@@ -51,11 +53,23 @@ const Admin = () => {
   const fetchProducts = async () => {
     const querySnapshot = await getDocs(collection(db, 'products'));
     const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setProducts(items);
-    setFilteredProducts(items);
-    const uniqueCategories = [...new Set(items.map(p => p.category))];
+  
+    // ✅ Sort once here
+    const sorted = items.sort((a, b) => {
+      if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
+        return a.displayOrder - b.displayOrder;
+      }
+      return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
+    });
+  
+    setProducts(sorted);
+    setFilteredProducts(sorted);
+  
+    const uniqueCategories = [...new Set(sorted.map(p => p.category))];
     setCategories(uniqueCategories);
   };
+  
+  
 
   const fetchOrders = async () => {
     const querySnapshot = await getDocs(collection(db, 'orders'));
@@ -64,6 +78,19 @@ const Admin = () => {
     setOrders(sortedItems);
     setFilteredOrders(sortedItems);
   };
+
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return;
+    const reordered = Array.from(filteredProducts);
+    const [movedItem] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, movedItem);
+    setFilteredProducts(reordered);
+    for (let i = 0; i < reordered.length; i++) {
+      await updateDoc(doc(db, 'products', reordered[i].id), { displayOrder: i });
+    }
+    setProducts(reordered);
+  };
+
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -170,7 +197,7 @@ const Admin = () => {
   return (
     <div style={{ padding: '2rem', marginTop: '25px', background: '#1a1a1a', minHeight: '100vh', color: '#fff' }}>
       <h2>Admin Panel</h2>
-
+      {/* rest of return JSX unchanged */}
       <div
   style={{
     marginBottom: '2rem',
@@ -218,51 +245,102 @@ const Admin = () => {
         </>
       )}
 
-      {showSection === 'products' && (
-        <>
-          <h3>All Products</h3>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchProductsTerm}
-            onChange={(e) => setSearchProductsTerm(e.target.value)}
-            style={{ marginBottom: '1rem', padding: '0.5rem', width: '100%', maxWidth: '400px' }}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {filteredProducts.map(p => (
-              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '60px 1fr auto auto', alignItems: 'center', background: '#333', padding: '1rem', borderRadius: '8px', gap: '1rem' }}>
-                {p.image && <img src={p.image} alt={p.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />}
-                <div>
-                  <strong>{p.name}</strong><br />
-                  ${p.price.toFixed(2)}<br />
-                  <span>{p.category}</span>
-                </div>
-                <div>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={p.featured}
-                      onChange={() => toggleProductField(p.id, 'featured', !p.featured)}
-                    /> Hot Item
-                  </label>
-                  <br />
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={p.inStock}
-                      onChange={() => toggleProductField(p.id, 'inStock', !p.inStock)}
-                    /> In Stock
-                  </label>
-                </div>
-                <div>
-                  <button onClick={() => handleEdit(p)} style={{ marginBottom: '0.5rem' }}>Edit</button>
-                  <button onClick={() => handleDelete(p.id)} style={{ background: 'crimson', color: '#fff' }}>Delete</button>
-                </div>
-              </div>
+{showSection === 'products' && (
+  <>
+    <h3>All Products</h3>
+    <input
+      type="text"
+      placeholder="Search products..."
+      value={searchProductsTerm}
+      onChange={(e) => setSearchProductsTerm(e.target.value)}
+      style={{ marginBottom: '1rem', padding: '0.5rem', width: '100%', maxWidth: '400px' }}
+    />
+
+    <DragDropContext
+      onDragEnd={async (result) => {
+        if (!result.destination) return;
+        const reordered = Array.from(filteredProducts);
+        const [moved] = reordered.splice(result.source.index, 1);
+        reordered.splice(result.destination.index, 0, moved);
+
+        setFilteredProducts(reordered);
+
+        // Save new order to Firestore
+        for (let index = 0; index < reordered.length; index++) {
+          const product = reordered[index];
+          await updateDoc(doc(db, 'products', product.id), {
+            displayOrder: index,
+          });
+        }
+      }}
+    >
+      <Droppable droppableId="products">
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+          >
+            {filteredProducts.map((p, index) => (
+              <Draggable key={p.id} draggableId={p.id} index={index}>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={{
+                      ...provided.draggableProps.style,
+                      display: 'grid',
+                      gridTemplateColumns: '60px 1fr auto auto',
+                      alignItems: 'center',
+                      background: '#333',
+                      padding: '1rem',
+                      borderRadius: '8px',
+                      gap: '1rem'
+                    }}
+                  >
+                    {p.image && <img src={p.image} alt={p.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />}
+                    <div>
+                      <strong>{p.name}</strong><br />
+                      ${p.price.toFixed(2)}<br />
+                      <span>{p.category}</span>
+                    </div>
+                    <div>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={p.featured}
+                          onChange={() => toggleProductField(p.id, 'featured', !p.featured)}
+                        /> Hot Item
+                      </label>
+                      <br />
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={p.inStock}
+                          onChange={() => toggleProductField(p.id, 'inStock', !p.inStock)}
+                        /> In Stock
+                      </label>
+                    </div>
+                    <div>
+                      <button onClick={() => handleEdit(p)} style={{ marginBottom: '0.5rem' }}>Edit</button>
+                      <button onClick={() => handleDelete(p.id)} style={{ background: 'crimson', color: '#fff' }}>Delete</button>
+                    </div>
+                  </div>
+                )}
+              </Draggable>
             ))}
+            {provided.placeholder}
           </div>
-        </>
-      )}
+        )}
+      </Droppable>
+    </DragDropContext>
+  </>
+)}
+
+
+
+          
 
       {showSection === 'orders' && (
         <div style={{ marginTop: '1rem' }}>
