@@ -85,9 +85,9 @@ const Home = ({ addToCart }) => {
 
   const buttonStyle = (active) => ({
     padding: '0.5rem 1.2rem',
-    background: active ? '#ff4081' : 'transparent',
-    color: active ? '#fff' : '#ff4081',
-    border: '2px solid #ff4081',
+    background: active ? '#FF4C61' : 'transparent',
+    color: active ? '#fff' : '#FF4C61',
+    border: '2px solid #FF4C61',
     borderRadius: '9999px',
     fontWeight: 'bold',
     cursor: 'pointer',
@@ -119,7 +119,7 @@ const Home = ({ addToCart }) => {
         minHeight: '350px'
       }}
     >
-      {p.featured && <span style={badgeHot}>Hot Item</span>}
+      {p.featured && <span style={{...badgeHot, background: '#FF4C61'}}>Hot Item</span>}
       {!p.inStock && <span style={badgeSoldOut}>Sold Out</span>}
       {p.image ? (
         <img src={p.image} alt={p.name} style={productImage} />
@@ -127,7 +127,7 @@ const Home = ({ addToCart }) => {
         <div style={imageFiller} />
       )}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <h3 style={{ marginBottom: '0.25rem' }}>{p.name}</h3>
+        <h3 style={{ marginBottom: '0.25rem', flexGrow:1, textAlign: 'center' }}>{p.name}</h3>
         <p style={{ marginBottom: '0.5rem' }}>${p.price.toFixed(2)}</p>
         <div style={qtyContainer}>
           <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) - 1)} style={qtyBtn}>-</button>
@@ -136,7 +136,8 @@ const Home = ({ addToCart }) => {
             min="1"
             value={quantities[p.id] || 1}
             onChange={(e) => handleQuantityChange(p.id, e.target.value)}
-            style={qtyInput}
+            style={{...qtyInput, margin:'0 5px'}}
+
           />
           <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) + 1)} style={qtyBtn}>+</button>
         </div>
@@ -148,17 +149,26 @@ const Home = ({ addToCart }) => {
           }}
           disabled={!p.inStock}
           style={{
-            marginTop: '0.5rem',
-            background: p.inStock ? '#ff4081' : '#555',
+            marginTop: 'auto',
+            background: p.inStock ? '#FF4C61' : '#555',
             color: '#fff',
             border: 'none',
             borderRadius: '9999px',
             padding: '0.5rem 1rem',
             fontWeight: 'bold',
             cursor: p.inStock ? 'pointer' : 'not-allowed',
-            opacity: p.inStock ? 1 : 0.6
-          }}
-        >
+
+          
+
+         
+          
+
+
+
+            opacity: p.inStock ? 1 : 0.6,
+            width: '100%',
+            textAlign: 'center',
+          }}>
           {p.inStock ? 'Add to Cart' : 'Out of Stock'}
         </button>
         {addedToCart[p.id] && (
@@ -309,13 +319,16 @@ const imageFiller = {
   marginBottom: '1rem',
   visibility: 'hidden'
 };
-
-const qtyBtn = {
+const cardBottom ={
+  display: 'flex',
+  marginTop:'auto',
+}
+ const qtyBtn = {
   width: '30px',
-  height: '30px',
+    height: '30px',
   borderRadius: '50%',
   border: 'none',
-  background: '#ff4081',
+  background: '#FF4C61',
   color: '#fff',
   fontWeight: 'bold',
   fontSize: '1rem',
@@ -323,11 +336,12 @@ const qtyBtn = {
 };
 
 const qtyInput = {
+
   width: '40px',
   textAlign: 'center',
   borderRadius: '999px',
   border: '1px solid #ccc',
-  padding: '0.25rem 0.5rem'
+  padding: '0.25rem 0.5rem',
 };
 
 const qtyContainer = {
@@ -400,7 +414,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
       height: '23px',
       borderRadius: '40%',
       border: 'none',
-      background: '#ff4081',
+        background: '#FF4C61',
       color: '#fff',
       fontWeight: 'bold',
       fontSize: '1rem',
@@ -417,7 +431,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
       height: '23px',
       borderRadius: '40%',
       border: 'none',
-      background: '#ff4081',
+        background: '#FF4C61',
       color: '#fff',
       fontWeight: 'bold',
       fontSize: '1rem',
@@ -455,7 +469,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
                 marginTop: '1rem',
                 padding: '0.4rem 1rem',
                 borderRadius: '999px',
-                background: '#ff4081',
+                background: '#FF4C61',
                 border: 'none',
                 color: 'white',
                 fontWeight: 'bold',
@@ -587,7 +601,7 @@ emailjs.send('service_2z696qf', 'template_5ziebjl', {
         padding: '0.5rem 1rem',         // ✅ Same padding as inputs
         borderRadius: '9999px',
         border: '1px solid #ccc',       // ✅ Match input border look
-        background: '#ff4081',
+        background: '#FF4C61',
         color: '#fff',
         fontWeight: 'bold',
         fontSize: '1rem',
@@ -700,7 +714,7 @@ function App() {
 
   const navButtonStyle = {
     color: '#fff',
-    background: '#ff4081',
+    background: 'none',
     padding: '0.5rem 1rem', // reduced vertical padding
     borderRadius: '9999px',
     textDecoration: 'none',
@@ -710,9 +724,14 @@ function App() {
     lineHeight: '1',
     display: 'inline-flex',
     alignItems: 'center',
+    border:'none',
+    cursor: 'pointer',
+    boxShadow:'none',
+    
     gap: '0.4rem',
     transition: 'all 0.2s ease-in-out'
   };
+
   
 
   const updateCartQuantity = (id, quantity) => {
@@ -720,42 +739,41 @@ function App() {
       item.id === id ? { ...item, quantity } : item
     ));
   };
-  
- 
 
   return (
     <Router>
-      <nav style={{
-  padding: '0.9rem',
-  background: '#000',
-  width: '100%',
-  left: 0,
-  right: 0,
-  position: 'fixed',
-  top: 0,
-  zIndex: 1000,
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  flexWrap: 'nowrap',
-  boxSizing: 'border-box',
-  overflowX: 'hidden'
-}}>
-
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <Link to="/" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</Link>
-          {user && <Link to="/admin" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Admin</Link>}
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <Link to="/cart" style={navButtonStyle}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <CartIcon cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)} />
-          </Link>
-          {!user ? (
-            <Link to="/login" style={navButtonStyle}>Admin Login</Link>
-          ) : (
-            <button onClick={handleLogout} style={{ ...navButtonStyle, border: 'none', cursor: 'pointer' }}>Logout</button>
-          )}
-        </div>
+       <nav style={{
+            padding: '0.9rem',
+            background: '#000',
+            width: '100%',
+            position: 'fixed',   
+            top: 0,
+             zIndex: 1000,
+            display: 'flex',
+             justifyContent: 'space-between',
+             padding: '0.9rem 0',
+            alignItems: 'center',
+            flexWrap: 'nowrap',
+            boxSizing: 'border-box',
+            overflowX: 'hidden'
+        }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <Link to="/" style={{...navButtonStyle, background:'#FF4C61', marginLeft: '1rem'}}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</Link>
+                {user && <Link to="/admin" style={{...navButtonStyle, background:'#FF4C61'}}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Admin</Link>}
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <Link to="/cart" style={{...navButtonStyle, background:'#FF4C61'}}onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                    <CartIcon cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)} />
+                </Link>
+                {!user ? (
+                    <Link to="/login" style={{...navButtonStyle, padding: '0.5rem 0.75rem', lineHeight: '1.2', background:'none', border:'none'}}>
+                        
+                        Admin Login
+                    </Link>
+                ) : (
+                    <button onClick={handleLogout} style={{ ...navButtonStyle, border: 'none', cursor: 'pointer' }}>Logout</button>
+                )}
+      </div>
       </nav>
 
       <Routes>
