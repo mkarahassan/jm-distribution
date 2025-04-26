@@ -136,14 +136,18 @@ const Home = ({ addToCart }) => {
     scrollRef.current.addEventListener('mousemove', handleMouseMove);
   
     return () => {
-      scrollRef.current.removeEventListener('mousedown', handleMouseDown)
+      if (scrollRef.current) {
+        scrollRef.current.removeEventListener('mousedown', handleMouseDown);
       scrollRef.current.removeEventListener('mouseleave', handleMouseLeave);
-      scrollRef.current.removeEventListener('mouseup', handleMouseUp);
+      scrollRef.current.removeEventListener('mouseup', (e)=>{
+        handleMouseUp(e)
+      });
       scrollRef.current.removeEventListener('mousemove', handleMouseMove);
       if(rafId){
         cancelAnimationFrame(rafId)
-      }
+      };
     };
+  }
   }, []);
 
   const handleQuantityChange = (productId, value) => {
