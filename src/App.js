@@ -44,6 +44,54 @@ const Home = ({ addToCart }) => {
   const scrollRef = useRef();
   
 
+
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+  let velocity = 0;
+  let rafId;
+  let lastX = 0;
+  const deceleration = 0.95; // Adjust for faster/slower deceleration
+
+  const handleMouseDown = (e) => {
+    isDown = true;
+    startX = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft = scrollRef.current.scrollLeft;
+    velocity = 0; // Reset velocity on new drag
+    lastX = e.pageX;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    isDown = false;
+  };
+
+  const handleMouseUp = (e) => {
+    isDown = false;
+    const currentX = e.pageX;
+    const dx = currentX - lastX; // Distance moved since last tick
+    velocity = dx * 3; // Set initial velocity
+  };
+
+  const animate = () => {
+    if (Math.abs(velocity) > 0.1) {
+      scrollRef.current.scrollLeft -= velocity;
+      velocity *= deceleration;
+      rafId = requestAnimationFrame(animate);
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) /50; // Adjust scroll speed
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+    scrollLeft = scrollLeft - walk
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       const querySnapshot = await getDocs(collection(db, 'products'));
@@ -78,6 +126,26 @@ const Home = ({ addToCart }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    scrollRef.current.addEventListener('mousedown', handleMouseDown)
+    scrollRef.current.addEventListener('mouseleave', handleMouseLeave);
+    scrollRef.current.addEventListener('mouseup', (e) => {
+      handleMouseUp(e);
+      rafId = requestAnimationFrame(animate);
+    });
+    scrollRef.current.addEventListener('mousemove', handleMouseMove);
+  
+    return () => {
+      scrollRef.current.removeEventListener('mousedown', handleMouseDown)
+      scrollRef.current.removeEventListener('mouseleave', handleMouseLeave);
+      scrollRef.current.removeEventListener('mouseup', handleMouseUp);
+      scrollRef.current.removeEventListener('mousemove', handleMouseMove);
+      if(rafId){
+        cancelAnimationFrame(rafId)
+      }
+    };
+  }, []);
+
   const handleQuantityChange = (productId, value) => {
     const qty = Math.max(1, parseInt(value) || 1);
     setQuantities(prev => ({ ...prev, [productId]: qty }));
@@ -85,9 +153,9 @@ const Home = ({ addToCart }) => {
 
   const buttonStyle = (active) => ({
     padding: '0.5rem 1.2rem',
-    background: active ? '#ff4081' : 'transparent',
-    color: active ? '#fff' : '#ff4081',
-    border: '2px solid #ff4081',
+    background: active ? '#FF4C61' : 'transparent',
+    color: active ? '#fff' : '#FF4C61',
+    border: '2px solid #FF4C61',
     borderRadius: '9999px',
     fontWeight: 'bold',
     cursor: 'pointer',
@@ -127,7 +195,7 @@ const Home = ({ addToCart }) => {
         <div style={imageFiller} />
       )}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <h3 style={{ marginBottom: '0.25rem' }}>{p.name}</h3>
+        <h3 style={{ marginBottom: '0.25rem', flexGrow:1 }}>{p.name}</h3>
         <p style={{ marginBottom: '0.5rem' }}>${p.price.toFixed(2)}</p>
         <div style={qtyContainer}>
           <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) - 1)} style={qtyBtn}>-</button>
@@ -137,6 +205,7 @@ const Home = ({ addToCart }) => {
             value={quantities[p.id] || 1}
             onChange={(e) => handleQuantityChange(p.id, e.target.value)}
             style={qtyInput}
+            
           />
           <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) + 1)} style={qtyBtn}>+</button>
         </div>
@@ -149,7 +218,7 @@ const Home = ({ addToCart }) => {
           disabled={!p.inStock}
           style={{
             marginTop: '0.5rem',
-            background: p.inStock ? '#ff4081' : '#555',
+            background: p.inStock ? '#FF4C61' : '#555',
             color: '#fff',
             border: 'none',
             borderRadius: '9999px',
@@ -276,7 +345,7 @@ const badgeHot = {
   position: 'absolute',
   top: '10px',
   right: '10px',
-  background: '#ff4081',
+  background: '#FF4C61',
   color: '#fff',
   padding: '2px 6px',
   fontSize: '0.75rem',
@@ -315,7 +384,7 @@ const qtyBtn = {
   height: '30px',
   borderRadius: '50%',
   border: 'none',
-  background: '#ff4081',
+  background: '#FF4C61',
   color: '#fff',
   fontWeight: 'bold',
   fontSize: '1rem',
@@ -400,7 +469,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
       height: '23px',
       borderRadius: '40%',
       border: 'none',
-      background: '#ff4081',
+      background: '#FF4C61',
       color: '#fff',
       fontWeight: 'bold',
       fontSize: '1rem',
@@ -417,7 +486,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
       height: '23px',
       borderRadius: '40%',
       border: 'none',
-      background: '#ff4081',
+      background: '#FF4C61',
       color: '#fff',
       fontWeight: 'bold',
       fontSize: '1rem',
@@ -455,7 +524,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
                 marginTop: '1rem',
                 padding: '0.4rem 1rem',
                 borderRadius: '999px',
-                background: '#ff4081',
+                background: '#FF4C61',
                 border: 'none',
                 color: 'white',
                 fontWeight: 'bold',
@@ -587,7 +656,7 @@ emailjs.send('service_2z696qf', 'template_5ziebjl', {
         padding: '0.5rem 1rem',         // ✅ Same padding as inputs
         borderRadius: '9999px',
         border: '1px solid #ccc',       // ✅ Match input border look
-        background: '#ff4081',
+        background: '#FF4C61',
         color: '#fff',
         fontWeight: 'bold',
         fontSize: '1rem',
@@ -700,7 +769,7 @@ function App() {
 
   const navButtonStyle = {
     color: '#fff',
-    background: '#ff4081',
+    background: '#FF4C61',
     padding: '0.5rem 1rem', // reduced vertical padding
     borderRadius: '9999px',
     textDecoration: 'none',
@@ -751,10 +820,13 @@ function App() {
             <CartIcon cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)} />
           </Link>
           {!user ? (
-            <Link to="/login" style={navButtonStyle}>Admin Login</Link>
-          ) : (
-            <button onClick={handleLogout} style={{ ...navButtonStyle, border: 'none', cursor: 'pointer' }}>Logout</button>
-          )}
+            <Link to="/login" style={{...navButtonStyle, padding: '0.5rem 0.75rem', lineHeight: '1.2', background:'none', border:'none'}}>
+                         
+            Admin Login
+        </Link>
+    ) : (
+      <button onClick={handleLogout} style={{ ...navButtonStyle, padding: '0.5rem 0.75rem', lineHeight: '1.2', background:'none', border:'none' }}>Logout</button>
+    )}
         </div>
       </nav>
 
