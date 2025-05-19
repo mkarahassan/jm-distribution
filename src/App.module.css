@@ -1,0 +1,81 @@
+/* src/App.module.css */
+.appNav {
+  padding: 0.9rem 1rem; 
+  background-color: var(--background-nav);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap; 
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.navLinkGroup {
+  display: flex;
+  gap: 0.75rem; 
+  align-items: center;
+}
+
+.navButton {
+  color: var(--button-primary-text); /* This is var(--text-on-accent) */
+  background-color: var(--accent-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-round);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px solid transparent; 
+}
+.navButton:hover {
+  background-color: var(--button-primary-hover-bg);
+}
+
+.navButtonLink {
+  background: none;
+  border: none;
+  color: var(--text-on-accent); /* Base color is white */
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius-round);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+.navButtonLink:hover {
+  background-color: var(--background-tertiary); 
+  color: var(--nav-button-link-hover-text); /* Use new variable */
+}
+
+.themeToggleButton {
+  background: none;
+  border: 1px solid var(--border-primary);
+  color: var(--text-on-accent); /* Base color is white */
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--border-radius-round);
+  font-size: 1.1rem; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+.themeToggleButton:hover {
+  background-color: var(--background-tertiary);
+  color: var(--theme-toggle-hover-text); /* Use new variable */
+  border-color: var(--theme-toggle-hover-border); /* Use new variable */
+}
+
+.mainContent {
+  padding-top: 70px; 
+}

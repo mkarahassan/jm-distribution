@@ -1,0 +1,124 @@
+/* src/Cart.module.css */
+.cartContainer {
+  /* uses .page-container from global.css */
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.cartTitle {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--accent-primary);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.emptyCartMessage {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.cartList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cartItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--card-background);
+  padding: 1rem;
+  border-radius: var(--border-radius-medium);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--card-shadow);
+}
+
+.cartItemImage {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: var(--border-radius-small);
+  background-color: transparent; /* CHANGED: Was white */
+  padding: 0.25rem; /* Keep padding if you want a small border effect around the image content */
+}
+
+.cartItemDetails {
+  flex: 1;
+}
+
+.cartItemName {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.cartItemQuantityControls {
+  display: flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  gap: 0.5rem;
+}
+
+.quantityAdjustButton {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; /* Make it round */
+  border: none;
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+  font-weight: bold;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.quantityAdjustButton:hover {
+  filter: brightness(1.1);
+}
+
+.cartItemQuantity {
+  font-size: 1rem;
+  min-width: 20px; /* Ensure space for number */
+  text-align: center;
+}
+
+.removeButton {
+  background: transparent;
+  border: none;
+  color: var(--accent-danger);
+  cursor: pointer;
+  margin-left: 0.75rem; /* Increased margin */
+  font-size: 1.1rem; /* Make icon slightly larger */
+}
+.removeButton:hover {
+  filter: brightness(0.8);
+}
+
+.cartItemPrice {
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.cartTotal {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: right;
+}
+
+.checkoutButton {
+  /* Base styles from global .btn .btn-primary */
+  margin-top: 1rem;
+  width: 100%; 
+  max-width: 300px; 
+  display: block; 
+  margin-left: auto;
+  margin-right: auto;
+}

@@ -1,0 +1,41 @@
+/* src/Login.module.css */
+.loginContainer {
+  max-width: 450px; 
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--card-shadow);
+}
+
+.loginTitle {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: var(--text-primary);
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.loginInput {
+  /* Base styles from global .input-field */
+  margin-bottom: 1.25rem;
+}
+
+.loginButton {
+  /* Base styles from global .btn .btn-primary */
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+}
+
+.errorMessage {
+  color: var(--accent-danger);
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: bold;
+}

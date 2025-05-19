@@ -1,19 +1,268 @@
-/* Global button click feedback */
+/* src/global.css */
+:root {
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Default: Dark Theme Variables */
+  --background-primary: #121212;
+  --background-secondary: #1e1e1e;
+  --background-tertiary: #2a2a2a; /* Used for hover backgrounds */
+  --background-nav: #000;
+  --background-header-panel: #1a1a1a;
+  --card-background: #222;
+  --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #888;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: #FF4C61; 
+  --accent-secondary: #8bc34a; 
+  --accent-danger: #dc3545; 
+
+  --border-primary: #333;
+  --border-secondary: #444;
+  --input-background: #333;
+  --input-border: #555;
+  --input-text: #fff;
+  --input-placeholder: #888;
+
+  --button-primary-bg: var(--accent-primary);
+  --button-primary-text: var(--text-on-accent);
+  --button-primary-hover-bg: #e03c50;
+  --button-secondary-bg: #444;
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: #555;
+
+  --link-color: var(--accent-primary);
+  --link-hover-color: #e03c50;
+
+  --scrollbar-thumb: #555;
+  --scrollbar-track: #333;
+
+  --spinner-color: var(--accent-primary);
+
+  --transition-speed: 0.2s;
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;
+  --border-radius-large: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-round: 9999px;
+
+  /* NEW: Navbar specific hover text/border colors */
+  --nav-button-link-hover-text: var(--text-on-accent);
+  --theme-toggle-hover-text: var(--text-on-accent);
+  --theme-toggle-hover-border: var(--border-secondary);
+}
+
+[data-theme="light"] {
+  --background-primary: #f4f4f8;
+  --background-secondary: #ffffff;
+  --background-tertiary: #e9ecef; /* Light hover background */
+  --background-nav: #333; 
+  --background-header-panel: #f8f9fa;
+  --card-background: #ffffff;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  --text-primary: #212529; /* Dark text for light mode */
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+  /* --text-on-accent remains white by default */
+
+  --border-primary: #dee2e6;
+  --border-secondary: #ced4da;
+  --input-background: #fff;
+  --input-border: #ced4da;
+  --input-text: #212529;
+  --input-placeholder: #6c757d;
+
+  --button-secondary-bg: #e9ecef;
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: #d3d9df;
+
+  --scrollbar-thumb: #adb5bd;
+  --scrollbar-track: #dee2e6;
+
+  /* NEW: Navbar specific hover text/border colors for light theme */
+  --nav-button-link-hover-text: var(--text-primary); /* Dark text on light hover */
+  --theme-toggle-hover-text: var(--text-primary);    /* Dark icon on light hover */
+  --theme-toggle-hover-border: var(--border-primary); /* Or a slightly darker light border for hover */
+}
+
+/* Basic Reset & Body Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
 button {
-    transition: transform 0.1s ease, filter 0.2s ease;
+  transition: transform 0.1s ease, filter 0.2s ease, background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  cursor: pointer;
+  font-family: inherit;
+  border: none; 
+}
+
+button:active {
+  transform: scale(0.95);
+  filter: brightness(0.9);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 10px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+.page-container {
+  padding: 1rem;
+  margin-top: 70px; 
+  min-height: calc(100vh - 70px);
+}
+
+.admin-page-container {
+   padding: 2rem;
+   margin-top: 50px; 
+   background: var(--background-secondary);
+   min-height: 100vh;
+   color: var(--text-primary);
+}
+
+.card {
+  background-color: var(--card-background);
+  color: var(--text-primary);
+  border-radius: var(--border-radius-medium);
+  padding: 1rem;
+  box-shadow: var(--card-shadow);
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+.input-field {
+  background-color: var(--input-background);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius-small); /* Default small radius for most inputs */
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  font-size: 1rem;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.input-field::placeholder {
+  color: var(--input-placeholder);
+}
+
+.btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--border-radius-round);
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: 2px solid var(--button-primary-bg);
+}
+.btn-primary:hover {
+  background-color: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-bg);
+}
+
+.btn-secondary {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: 2px solid var(--border-secondary);
+}
+.btn-secondary:hover {
+  background-color: var(--button-secondary-hover-bg);
+}
+
+.btn-danger {
+  background-color: var(--accent-danger);
+  color: var(--text-on-accent);
+  border: 2px solid var(--accent-danger);
+}
+.btn-danger:hover {
+  filter: brightness(0.9);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--link-color);
+  padding: 0.5rem 0.75rem;
+  line-height: 1.2;
+  font-weight: bold;
+}
+.btn-link:hover {
+  color: var(--link-hover-color);
+}
+
+.text-success {
+  color: var(--accent-secondary);
+}
+
+.text-danger {
+  color: var(--accent-danger);
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: var(--spinner-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  button:active {
-    transform: scale(0.95);
-    filter: brightness(0.9);
-  }
-  
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
+}
+
+.loading-text {
+  color: var(--text-primary);
+  text-align: center;
+  font-size: 1.2rem;
+}

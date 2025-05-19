@@ -1,0 +1,18 @@
+/* src/CartIcon.module.css */
+.cartIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  /* paddingTop: '2px' - this can be adjusted if still needed, or handled by parent's line-height */
+}
+
+.icon {
+  font-size: 1rem; /* Consistent with text */
+  /* Color will be inherited from parent button by default */
+}
+
+.text {
+  font-size: 1rem; /* Consistent with icon */
+  /* Color will be inherited from parent button by default */
+}

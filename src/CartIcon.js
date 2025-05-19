@@ -1,7 +1,8 @@
-// CartIcon.js
+// src/CartIcon.js
 import React, { useEffect, useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 import { motion, useAnimation } from 'framer-motion';
+import styles from './CartIcon.module.css'; // Import CSS Module
 
 const CartIcon = ({ cartCount }) => {
   const controls = useAnimation();
@@ -20,16 +21,14 @@ const CartIcon = ({ cartCount }) => {
   return (
     <motion.div
       animate={controls}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '0.4rem',
-        paddingTop: '2px' // 👈 This nudges everything downward inside the button
-      }}
+      className={styles.cartIconWrapper}
+      // The inline style 'paddingTop' was minimal; if still needed,
+      // it's often better to adjust line-height or padding on the parent button.
+      // For now, removing it as the flex alignment should handle most cases.
+      // style={{ paddingTop: '2px' }}
     >
-      <FaShoppingCart style={{ fontSize: '1rem' }} />
-      <span style={{ fontSize: '1rem' }}>Cart</span>
+      <FaShoppingCart className={styles.icon} />
+      <span className={styles.text}>Cart ({cartCount})</span> {/* Display cart count directly here */}
     </motion.div>
   );
 };

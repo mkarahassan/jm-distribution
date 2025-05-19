@@ -1,0 +1,12 @@
+/* src/ProtectedRoute.module.css */
+.loadingMessage {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 2rem;
+  min-height: 100vh; /* Ensure it takes up space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-primary); /* So it's not on a white screen during load if body bg isn't set yet */
+}

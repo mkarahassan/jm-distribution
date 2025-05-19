@@ -1,0 +1,61 @@
+/* src/Checkout.module.css */
+.checkoutPageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  padding-top: 2rem;
+}
+
+.checkoutTitle {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+.checkoutForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--card-shadow);
+}
+
+.checkoutInput {
+  /* Base styles from global .input-field */
+  margin-bottom: 1.25rem; 
+}
+
+.placeOrderButton {
+  /* Base styles from global .btn .btn-primary */
+  width: 100%;
+  padding: 0.75rem 1rem; 
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+}
+
+.orderPlacedContainer {
+  text-align: center;
+  background-color: var(--background-secondary);
+  padding: 3rem 1rem;
+  border-radius: var(--border-radius-medium);
+  color: var(--text-primary);
+}
+
+.orderPlacedTitle {
+  font-size: 2rem;
+  color: var(--accent-secondary);
+  margin-bottom: 1rem;
+}
+
+.orderPlacedMessage {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
