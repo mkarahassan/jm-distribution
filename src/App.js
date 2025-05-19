@@ -25,7 +25,7 @@ const Home = ({ addToCart }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [quantities, setQuantities] = useState({});
+  const [quantities, setQuantities] = useState({}); // Stores raw input strings or numbers
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
   const [addedToCart, setAddedToCart] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,7 +35,6 @@ const Home = ({ addToCart }) => {
   const [startX, setStartX] = useState(0);
   const [scrollLeftStart, setScrollLeftStart] = useState(0);
 
-  // Memoize event handlers for drag-to-scroll
   const handleMouseDown = useCallback((e) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
@@ -45,11 +44,10 @@ const Home = ({ addToCart }) => {
   }, []); 
 
   const handleMouseLeaveOrUp = useCallback(() => {
-    // Only change cursor if it was grabbing and the ref is still valid
     if (scrollRef.current && isDragging) { 
         scrollRef.current.style.cursor = 'grab';
     }
-    setIsDragging(false); // Always set dragging to false
+    setIsDragging(false);
   }, [isDragging]); 
 
   const handleMouseMove = useCallback((e) => {
@@ -95,7 +93,7 @@ const Home = ({ addToCart }) => {
         setCategories(uniqueCategories);
         const initialQuantities = {};
         sorted.forEach(item => {
-          initialQuantities[item.id] = 1;
+          initialQuantities[item.id] = '1'; // Initialize as string '1'
         });
         setQuantities(initialQuantities);
       } catch (error) {
@@ -117,10 +115,35 @@ const Home = ({ addToCart }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleQuantityChange = (productId, value) => {
-    const qty = Math.max(1, parseInt(value) || 1);
-    setQuantities(prev => ({ ...prev, [productId]: qty }));
+  // Handles direct input into the quantity field
+  const handleQuantityInputChange = (productId, rawValue) => {
+    // Allow empty string for typing, or positive integers
+    if (rawValue === '' || (/^[1-9][0-9]*$/.test(rawValue) && parseInt(rawValue) > 0) ) {
+      setQuantities(prev => ({ ...prev, [productId]: rawValue }));
+    } else if (rawValue === '0' && quantities[productId] !== '0') { // Allow typing '0' initially if not already '0'
+        setQuantities(prev => ({ ...prev, [productId]: rawValue }));
+    }
   };
+  
+  // Handles blur event for quantity input: validate and set to 1 if invalid/empty
+  const handleQuantityInputBlur = (productId) => {
+    const currentValue = quantities[productId];
+    const parsedValue = parseInt(currentValue);
+    if (isNaN(parsedValue) || parsedValue < 1) {
+      setQuantities(prev => ({ ...prev, [productId]: '1' }));
+    }
+  };
+
+  // Handles +/- button clicks
+  const adjustQuantity = (productId, amount) => {
+    const currentVal = parseInt(quantities[productId]) || 0; // Default to 0 if NaN (e.g. empty input)
+    let newVal = currentVal + amount;
+    if (newVal < 1) {
+      newVal = 1; // Ensure quantity doesn't go below 1 via buttons
+    }
+    setQuantities(prev => ({ ...prev, [productId]: String(newVal) }));
+  };
+
 
   const renderProductCard = (p) => (
     <motion.div
@@ -144,23 +167,29 @@ const Home = ({ addToCart }) => {
         <p className={homeStyles.productPrice}>${p.price.toFixed(2)}</p>
         <div className={homeStyles.qtyContainer}>
           <button 
-            onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) - 1)} 
+            onClick={() => adjustQuantity(p.id, -1)} 
             className={homeStyles.qtyBtn}
-            disabled={(quantities[p.id] || 1) <= 1}
+            disabled={(parseInt(quantities[p.id]) || 1) <= 1 && quantities[p.id] !== '0'} // Disable if 1 or less, unless it's '0' from typing
           >-</button>
           <input
-            type="number"
-            min="1"
-            value={quantities[p.id] || 1}
-            onChange={(e) => handleQuantityChange(p.id, e.target.value)}
+            type="number" // Keep type number for native controls on mobile, but we handle logic
+            value={quantities[p.id] === undefined ? '1' : quantities[p.id]}
+            onChange={(e) => handleQuantityInputChange(p.id, e.target.value)}
+            onBlur={() => handleQuantityInputBlur(p.id)} // Validate on blur
             className={homeStyles.qtyInput}
+            min="1" // HTML5 validation hint
           />
-          <button onClick={() => handleQuantityChange(p.id, (quantities[p.id] || 1) + 1)} className={homeStyles.qtyBtn}>+</button>
+          <button onClick={() => adjustQuantity(p.id, 1)} className={homeStyles.qtyBtn}>+</button>
         </div>
         <button
           onClick={() => {
-            addToCart({ ...p, quantity: quantities[p.id] || 1 });
+            const quantityToAdd = Math.max(1, parseInt(quantities[p.id]) || 1); // Final validation
+            addToCart({ ...p, quantity: quantityToAdd });
             setAddedToCart(prev => ({ ...prev, [p.id]: true }));
+            // Optionally reset the input to the validated quantity if it was, e.g., empty
+            if (String(quantities[p.id]) !== String(quantityToAdd)) {
+                 setQuantities(prev => ({ ...prev, [p.id]: String(quantityToAdd) }));
+            }
             setTimeout(() => setAddedToCart(prev => ({ ...prev, [p.id]: false })), 2000);
           }}
           disabled={!p.inStock}
@@ -205,14 +234,13 @@ const Home = ({ addToCart }) => {
         <h1 className={homeStyles.headerTitle}>JM Distribution</h1>
         <p className={homeStyles.headerSubtitle}>Cell: (714) 362-6281</p>
         <div className={homeStyles.searchContainer}>
-          
-<input
-  type="text"
-  placeholder="Search products..."
-  value={searchQuery}
-  onChange={(e) => setSearchQuery(e.target.value)}
-  className={homeStyles.searchInput} // CHANGED HERE
-/>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={homeStyles.searchInput} 
+          />
         </div>
         <div className={homeStyles.categoryFilterContainerOuter}>
           <div
@@ -358,7 +386,6 @@ const Checkout = ({ cart, clearCart }) => {
     };
 
     try {
-      // Using the provided EmailJS public key directly
       const emailJsPublicKey = '5YgacT8wW9cQ0ldnp'; 
       
       console.log("Attempting to send email with params:", {

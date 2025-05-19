@@ -43,8 +43,8 @@
   height: 60px;
   object-fit: contain;
   border-radius: var(--border-radius-small);
-  background-color: transparent; /* CHANGED: Was white */
-  padding: 0.25rem; /* Keep padding if you want a small border effect around the image content */
+  background-color: transparent; 
+  padding: 0.25rem; 
 }
 
 .cartItemDetails {
@@ -67,7 +67,7 @@
 .quantityAdjustButton {
   width: 25px;
   height: 25px;
-  border-radius: 50%; /* Make it round */
+  border-radius: 50%; 
   border: none;
   background-color: var(--accent-primary);
   color: var(--text-on-accent);
@@ -83,7 +83,7 @@
 
 .cartItemQuantity {
   font-size: 1rem;
-  min-width: 20px; /* Ensure space for number */
+  min-width: 20px; 
   text-align: center;
 }
 
@@ -92,8 +92,8 @@
   border: none;
   color: var(--accent-danger);
   cursor: pointer;
-  margin-left: 0.75rem; /* Increased margin */
-  font-size: 1.1rem; /* Make icon slightly larger */
+  margin-left: 0.75rem; 
+  font-size: 1.1rem; 
 }
 .removeButton:hover {
   filter: brightness(0.8);
@@ -114,11 +114,13 @@
 }
 
 .checkoutButton {
-  /* Base styles from global .btn .btn-primary */
+  /* Base styles from global .btn .btn-primary will be applied in JS */
   margin-top: 1rem;
   width: 100%; 
   max-width: 300px; 
   display: block; 
   margin-left: auto;
   margin-right: auto;
+  font-size: 1rem; /* INCREASED FONT SIZE */
+  padding: 0.5rem 1rem; /* Adjusted padding for larger font */
 }

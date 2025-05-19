@@ -3,16 +3,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  /* paddingTop: '2px' - this can be adjusted if still needed, or handled by parent's line-height */
+  gap: 0.3rem; /* UPDATED: Match .navItemBase gap */
 }
 
 .icon {
-  font-size: 1rem; /* Consistent with text */
-  /* Color will be inherited from parent button by default */
+  font-size: inherit; /* UPDATED: Inherit font-size from parent */
+  display: flex; /* Helps with vertical alignment of icon */
+  align-items: center;
 }
 
 .text {
-  font-size: 1rem; /* Consistent with icon */
-  /* Color will be inherited from parent button by default */
+  font-size: inherit; /* UPDATED: Inherit font-size from parent */
+  line-height: 1; /* Prevent extra line height from affecting button size */
 }
