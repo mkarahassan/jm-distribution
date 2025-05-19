@@ -1,6 +1,6 @@
 /* src/App.module.css */
 .appNav {
-  padding: 0.9rem 1rem; 
+  padding: 0.5rem 0.75rem; /* Reduced padding for mobile */
   background-color: var(--background-nav);
   width: 100%;
   position: fixed;
@@ -11,30 +11,32 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: nowrap; 
+  /* flex-wrap: nowrap; /* Allow wrapping on very small screens if necessary */
   box-sizing: border-box;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  min-height: 50px; /* Ensure a minimum height */
 }
 
 .navLinkGroup {
   display: flex;
-  gap: 0.75rem; 
+  gap: 0.5rem; /* Reduced gap for mobile */
   align-items: center;
 }
 
 .navButton {
-  color: var(--button-primary-text); /* This is var(--text-on-accent) */
+  color: var(--button-primary-text); 
   background-color: var(--accent-primary);
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem; /* Reduced padding for mobile */
   border-radius: var(--border-radius-round);
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Reduced font size for mobile */
   line-height: 1.2;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem; /* Reduced gap */
   border: 2px solid transparent; 
+  white-space: nowrap; /* Prevent text wrapping inside button */
 }
 .navButton:hover {
   background-color: var(--button-primary-hover-bg);
@@ -43,28 +45,29 @@
 .navButtonLink {
   background: none;
   border: none;
-  color: var(--text-on-accent); /* Base color is white */
-  padding: 0.5rem 0.75rem;
+  color: var(--text-on-accent); 
+  padding: 0.4rem 0.6rem; /* Reduced padding */
   border-radius: var(--border-radius-round);
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Reduced font size */
   line-height: 1.2;
+  white-space: nowrap; /* Prevent text wrapping inside button */
   transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 .navButtonLink:hover {
   background-color: var(--background-tertiary); 
-  color: var(--nav-button-link-hover-text); /* Use new variable */
+  color: var(--nav-button-link-hover-text); 
 }
 
 .themeToggleButton {
   background: none;
   border: 1px solid var(--border-primary);
-  color: var(--text-on-accent); /* Base color is white */
-  padding: 0.4rem 0.6rem;
+  color: var(--text-on-accent); 
+  padding: 0.3rem 0.5rem; /* Reduced padding */
   border-radius: var(--border-radius-round);
-  font-size: 1.1rem; 
+  font-size: 1rem; /* Slightly smaller icon size if needed */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,10 +75,34 @@
 }
 .themeToggleButton:hover {
   background-color: var(--background-tertiary);
-  color: var(--theme-toggle-hover-text); /* Use new variable */
-  border-color: var(--theme-toggle-hover-border); /* Use new variable */
+  color: var(--theme-toggle-hover-text); 
+  border-color: var(--theme-toggle-hover-border); 
 }
 
+/* Adjust main content padding based on new nav height */
 .mainContent {
-  padding-top: 70px; 
+  padding-top: 50px; /* Adjusted to match new min-height of nav */
+}
+
+/* Media query for very small screens if items still overlap */
+@media (max-width: 380px) {
+  .appNav {
+    padding: 0.5rem; /* Further reduce padding */
+     /* If absolutely necessary, allow wrapping and adjust alignment
+    flex-wrap: wrap;
+    justify-content: center; 
+    min-height: auto; /* Allow height to adjust if wrapping */
+  }
+  .navLinkGroup {
+    gap: 0.3rem; /* Further reduce gap */
+  }
+  .navButton, .navButtonLink {
+    font-size: 0.75rem; /* Even smaller font */
+    padding: 0.3rem 0.5rem;
+  }
+  .themeToggleButton {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.9rem;
+  }
+  /* If nav wraps, .mainContent padding-top might need dynamic adjustment or a larger fixed value */
 }

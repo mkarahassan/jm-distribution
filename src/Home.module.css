@@ -10,27 +10,28 @@
 
 .fixedHeaderPanel {
   position: fixed;
-  top: 60px; 
+  top: 50px; /* Adjusted for mobile nav height */
   left: 0;
   right: 0;
   z-index: 900; 
   background-color: var(--background-header-panel);
-  padding: 1rem 1rem 0.5rem;
+  padding: 0.75rem 1rem 0.5rem; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid var(--border-primary);
 }
 
-.headerTitle {
-  margin: 0 0 0.25rem 0;
+.headerTitle { /* Company Name "JM Distribution" */
+  margin: 0 0 0.1rem 0; /* Adjusted bottom margin slightly */
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 2rem; /* INCREASED FONT SIZE */
+  font-weight: bold; /* Added for more prominence */
   color: var(--text-primary);
 }
 
-.headerSubtitle {
-  margin: 0 0 1rem 0;
+.headerSubtitle { /* Phone Number */
+  margin: 0 0 0.75rem 0; 
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1rem; /* INCREASED FONT SIZE */
   color: var(--text-secondary);
 }
 
@@ -44,15 +45,14 @@
 }
 
 .searchInput {
-  /* Self-contained styles for the home search input */
   width: 100%;
   max-width: 400px;
-  padding: 0.6rem 1.2rem; 
-  border-radius: var(--border-radius-round); /* Pill shape */
+  padding: 0.5rem 1rem; 
+  border-radius: var(--border-radius-round); 
   border: 1px solid var(--input-border);
   background-color: var(--input-background);
   color: var(--input-text);
-  font-size: 1rem; 
+  font-size: 0.9rem; 
   box-sizing: border-box;
   transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
 }
