@@ -1,18 +1,38 @@
 /* src/CartIcon.module.css */
 .cartIconWrapper {
+  position: relative; /* This is the anchor for the badge's absolute positioning */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem; /* UPDATED: Match .navItemBase gap */
 }
 
 .icon {
-  font-size: inherit; /* UPDATED: Inherit font-size from parent */
-  display: flex; /* Helps with vertical alignment of icon */
+  font-size: 1.5rem; /* A good base size for the cart icon */
+  color: inherit; /* Inherit color from the parent nav button */
+  display: flex; 
   align-items: center;
 }
 
-.text {
-  font-size: inherit; /* UPDATED: Inherit font-size from parent */
-  line-height: 1; /* Prevent extra line height from affecting button size */
+/* Styles for the numbered badge */
+.cartBadge {
+  position: absolute;
+  top: -5px;      /* Position it slightly above the top edge of the icon */
+  right: -8px;    /* Position it slightly past the right edge of the icon */
+  
+  background-color: var(--accent-primary); /* Use the app's primary accent color */
+  color: var(--text-on-accent); /* White text */
+  border-radius: 50%; /* Make it a circle */
+  
+  width: 20px;    /* Set a fixed width */
+  height: 20px;   /* Set a fixed height */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: 0.75rem; /* Small font size for the number */
+  font-weight: bold;
+  
+  /* Add a small border for better definition if needed */
+  border: 1px solid var(--background-nav);
 }

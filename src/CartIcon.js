@@ -1,35 +1,28 @@
 // src/CartIcon.js
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
-import { motion, useAnimation } from 'framer-motion';
-import styles from './CartIcon.module.css'; // Import CSS Module
+import { motion, AnimatePresence } from 'framer-motion';
+import styles from './CartIcon.module.css';
 
 const CartIcon = ({ cartCount }) => {
-  const controls = useAnimation();
-  const [prevCount, setPrevCount] = useState(cartCount);
-
-  useEffect(() => {
-    if (cartCount > prevCount) {
-      controls.start({
-        y: [0, -5, 0],
-        transition: { duration: 0.5, ease: 'easeInOut' }
-      });
-    }
-    setPrevCount(cartCount);
-  }, [cartCount, controls, prevCount]);
-
   return (
-    <motion.div
-      animate={controls}
-      className={styles.cartIconWrapper}
-      // The inline style 'paddingTop' was minimal; if still needed,
-      // it's often better to adjust line-height or padding on the parent button.
-      // For now, removing it as the flex alignment should handle most cases.
-      // style={{ paddingTop: '2px' }}
-    >
+    <div className={styles.cartIconWrapper}>
       <FaShoppingCart className={styles.icon} />
-      <span className={styles.text}>Cart ({cartCount})</span> {/* Display cart count directly here */}
-    </motion.div>
+      <AnimatePresence>
+        {cartCount > 0 && (
+          <motion.div
+            className={styles.cartBadge}
+            initial={{ scale: 0, y: -10 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            key={cartCount} // Add key to re-animate on change if desired, though not strictly necessary here
+          >
+            {cartCount}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 

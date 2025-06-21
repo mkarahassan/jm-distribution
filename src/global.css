@@ -6,7 +6,7 @@
   /* Default: Dark Theme Variables */
   --background-primary: #121212;
   --background-secondary: #1e1e1e;
-  --background-tertiary: #2a2a2a; /* Used for hover backgrounds */
+  --background-tertiary: #2a2a2a; 
   --background-nav: #000;
   --background-header-panel: #1a1a1a;
   --card-background: #222;
@@ -50,7 +50,6 @@
   --border-radius-xl: 16px;
   --border-radius-round: 9999px;
 
-  /* NEW: Navbar specific hover text/border colors */
   --nav-button-link-hover-text: var(--text-on-accent);
   --theme-toggle-hover-text: var(--text-on-accent);
   --theme-toggle-hover-border: var(--border-secondary);
@@ -59,16 +58,15 @@
 [data-theme="light"] {
   --background-primary: #f4f4f8;
   --background-secondary: #ffffff;
-  --background-tertiary: #e9ecef; /* Light hover background */
+  --background-tertiary: #e9ecef; 
   --background-nav: #333; 
   --background-header-panel: #f8f9fa;
   --card-background: #ffffff;
   --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-  --text-primary: #212529; /* Dark text for light mode */
+  --text-primary: #212529; 
   --text-secondary: #495057;
   --text-muted: #6c757d;
-  /* --text-on-accent remains white by default */
 
   --border-primary: #dee2e6;
   --border-secondary: #ced4da;
@@ -84,10 +82,9 @@
   --scrollbar-thumb: #adb5bd;
   --scrollbar-track: #dee2e6;
 
-  /* NEW: Navbar specific hover text/border colors for light theme */
-  --nav-button-link-hover-text: var(--text-primary); /* Dark text on light hover */
-  --theme-toggle-hover-text: var(--text-primary);    /* Dark icon on light hover */
-  --theme-toggle-hover-border: var(--border-primary); /* Or a slightly darker light border for hover */
+  --nav-button-link-hover-text: var(--text-primary); 
+  --theme-toggle-hover-text: var(--text-primary);    
+  --theme-toggle-hover-border: var(--border-primary); 
 }
 
 /* Basic Reset & Body Styles */
@@ -147,15 +144,15 @@ button:active {
 
 .page-container {
   padding: 1rem;
-  margin-top: 70px; 
-  min-height: calc(100vh - 70px);
+  /* margin-top: 70px; /* REMOVED: Spacing is now handled by .mainContent in App.module.css */
+  min-height: 100%; /* CHANGED: Let the container fill its parent's height */
 }
 
 .admin-page-container {
    padding: 2rem;
-   margin-top: 50px; 
+   /* margin-top: 50px; /* REMOVED: Spacing is now handled by .mainContent in App.module.css */
    background: var(--background-secondary);
-   min-height: 100vh;
+   min-height: 100%; /* CHANGED: Let the container fill its parent's height */
    color: var(--text-primary);
 }
 
@@ -172,7 +169,7 @@ button:active {
   background-color: var(--input-background);
   color: var(--input-text);
   border: 1px solid var(--input-border);
-  border-radius: var(--border-radius-small); /* Default small radius for most inputs */
+  border-radius: var(--border-radius-small); 
   padding: 0.5rem 1rem;
   margin-bottom: 1rem;
   width: 100%;

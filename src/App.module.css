@@ -1,6 +1,8 @@
 /* src/App.module.css */
+
+/* --- DESKTOP STYLES (Applies when screen width > 768px) --- */
 .appNav {
-  padding: 0.5rem 0.75rem; 
+  padding: 0.5rem 1rem;
   background-color: var(--background-nav);
   width: 100%;
   position: fixed;
@@ -13,7 +15,7 @@
   align-items: center;
   box-sizing: border-box;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  min-height: 58px; /* INCREASED: Was 50px, adjust as needed based on new button sizes */
+  min-height: 60px;
 }
 
 .navLinkGroup {
@@ -22,17 +24,16 @@
   align-items: center;
 }
 
-/* Base style for all interactive nav items */
 .navItemBase {
-  padding: 0.5rem 1rem; /* INCREASED: Was 0.4rem 0.8rem */
+  padding: 0.5rem 1rem; 
   border-radius: var(--border-radius-round);
   font-weight: bold;
-  font-size: 0.9rem; /* INCREASED: Was 0.8rem */
+  font-size: 0.9rem; 
   line-height: 1.2; 
   display: inline-flex;
   align-items: center;
   justify-content: center; 
-  gap: 0.4rem; /* INCREASED: Was 0.3rem, for slightly more space with icons */
+  gap: 0.4rem; 
   text-decoration: none;
   white-space: nowrap; 
   transition: background-color var(--transition-speed) ease, 
@@ -46,7 +47,7 @@
   transform: scale(0.95);
 }
 
-.navButton { /* For Home, Admin, Cart buttons (containing text and potentially icons) */
+.navButton {
   composes: navItemBase; 
   color: var(--button-primary-text); 
   background-color: var(--accent-primary);
@@ -58,7 +59,7 @@
   color: var(--button-primary-text); 
 }
 
-.navButtonLink { /* For Login/Logout text links */
+.navButtonLink {
   composes: navItemBase; 
   background: none;
   color: var(--text-on-accent); 
@@ -69,14 +70,14 @@
   border-color: var(--background-tertiary); 
 }
 
-.themeToggleButton { /* For the icon-only theme toggle */
+.themeToggleButton {
   composes: navItemBase; 
   background: none;
   border: 2px solid var(--border-primary); 
   color: var(--text-on-accent); 
-  padding: 0.5rem; /* INCREASED & made square: Was 0.4rem */
-  font-size: 1rem; /* INCREASED: Was 0.9rem, for a slightly larger icon */
-  gap: 0; /* Icon-only button doesn't need a gap */
+  padding: 0.5rem; 
+  font-size: 1rem; 
+  gap: 0;
 }
 .themeToggleButton:hover {
   background-color: var(--background-tertiary);
@@ -85,27 +86,148 @@
 }
 
 .mainContent {
-  padding-top: 58px; /* INCREASED: Was 50px, should match .appNav min-height */
+  padding-top: 60px; /* Default for desktop */
 }
 
-@media (max-width: 380px) {
+
+/* --- MOBILE STYLES (Applies when screen width <= 768px) --- */
+@media (max-width: 768px) {
   .appNav {
-    padding: 0.4rem 0.5rem; /* Adjusted for slightly larger base buttons */
-    min-height: 52px; /* Adjusted */
-  }
-  .navLinkGroup {
-    gap: 0.4rem; /* Adjusted */
-  }
-  .navItemBase { 
-    font-size: 0.8rem; /* INCREASED: Was 0.75rem */
-    padding: 0.4rem 0.6rem; /* INCREASED: Was 0.3rem 0.5rem */
-    gap: 0.2rem; /* Adjusted */
-  }
-   .themeToggleButton { 
-    padding: 0.4rem; /* Adjusted */
-    font-size: 0.9rem; /* INCREASED: Was 0.8rem */
+    /* Hide the desktop nav on mobile */
+    display: none;
   }
   .mainContent {
-    padding-top: 52px; /* Adjusted */
+    /* Set padding-top to the height of the mobile nav container */
+    padding-top: 85px; 
+  }
+
+  .mobileNavContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: var(--background-nav);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .topBar {
+    background-color: var(--accent-primary);
+    color: var(--text-on-accent);
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0.3rem;
+  }
+
+  .mainMobileNav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    height: 55px; 
+  }
+
+  .hamburgerIcon {
+    background: none;
+    border: none;
+    color: var(--text-on-accent);
+    font-size: 1.5rem;
+    padding: 0.25rem;
+  }
+
+  .mobileLogo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-primary);
+    text-decoration: none;
+  }
+
+  .mobileSearchWrapper {
+    flex-grow: 1; 
+    padding: 0 0.5rem;
+  }
+
+  .mobileSearchInput {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: var(--border-radius-round);
+    border: 1px solid var(--input-border);
+    background-color: var(--input-background);
+    color: var(--input-text);
+    font-size: 0.9rem;
+  }
+  .mobileSearchInput::placeholder {
+    color: var(--input-placeholder);
+  }
+
+  .mobileCartIcon {
+    background: none;
+    border: none;
+    color: var(--text-on-accent);
+    font-size: 1.5rem;
+    padding: 0.25rem;
+    text-decoration: none; 
+  }
+
+  .mobileMenuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 1010; 
+  }
+
+  .mobileMenuContent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 80%;
+    max-width: 300px;
+    background-color: var(--background-secondary);
+    z-index: 1020;
+    padding: 2rem;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mobileMenuHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-primary);
+    padding-bottom: 1rem;
+  }
+  .mobileMenuHeader h3 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+  }
+  .closeMenuButton {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+  }
+
+  .mobileMenuLink {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .mobileMenuActions {
+    margin-top: auto; 
+    padding-top: 1.5rem; 
+    border-top: 1px solid var(--border-primary); 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }

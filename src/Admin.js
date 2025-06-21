@@ -8,7 +8,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styles from './Admin.module.css'; 
 
 // StrictMode-compatible Droppable
-// This wrapper delays rendering Droppable by one frame to avoid issues with React 18 StrictMode
 const StrictModeDroppable = ({ children, ...props }) => {
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
@@ -32,7 +31,8 @@ const Admin = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchOrdersTerm, setSearchOrdersTerm] = useState('');
   const [searchProductsTerm, setSearchProductsTerm] = useState('');
-  const [showSection, setShowSection] = useState('products'); // Default to products view
+  // UPDATED: Changed default view from 'products' to 'orders'
+  const [showSection, setShowSection] = useState('orders'); 
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
@@ -46,7 +46,6 @@ const Admin = () => {
   const [messageType, setMessageType] = useState(''); 
   const [editId, setEditId] = useState(null);
 
-  // Memoized function to clear the product form
   const clearForm = useCallback(() => {
     setName('');
     setPrice('');
@@ -59,7 +58,6 @@ const Admin = () => {
     setEditId(null);
   }, []);
   
-  // Function to display messages (success/error)
   const displayMessage = (msg, type = 'success', duration = 3000) => {
     setMessage(msg);
     setMessageType(type);
@@ -69,12 +67,10 @@ const Admin = () => {
     }, duration);
   };
 
-  // Memoized function to fetch products from Firestore
   const fetchProducts = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'products'));
       const items = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-      // Sort products by displayOrder, then by creation date as a fallback
       const sorted = items.sort((a, b) => {
         if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
           return a.displayOrder - b.displayOrder;
@@ -82,8 +78,8 @@ const Admin = () => {
         return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
       });
       setProducts(sorted);
-      setFilteredProducts(sorted); // Initialize filtered products with all sorted products
-      const uniqueCategories = [...new Set(sorted.map(p => p.category).filter(Boolean))]; // Filter out empty/null categories
+      setFilteredProducts(sorted); 
+      const uniqueCategories = [...new Set(sorted.map(p => p.category).filter(Boolean))];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -91,28 +87,24 @@ const Admin = () => {
     }
   }, []); 
   
-  // Memoized function to fetch orders from Firestore
   const fetchOrders = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'orders'));
       const items = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-      // Sort orders by creation date, newest first
       const sortedItems = items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
       setOrders(sortedItems);
-      setFilteredOrders(sortedItems); // Initialize filtered orders
+      setFilteredOrders(sortedItems);
     } catch (error) {
       console.error("Error fetching orders:", error);
       displayMessage("Failed to fetch orders.", "error");
     }
   }, []);
 
-  // Fetch initial data on component mount
   useEffect(() => {
     fetchProducts();
     fetchOrders();
-  }, [fetchProducts, fetchOrders]); // Dependencies are the memoized functions
+  }, [fetchProducts, fetchOrders]);
 
-  // Effect to filter orders based on search term
   useEffect(() => {
     const filtered = orders.filter(order => {
       const searchTermLower = searchOrdersTerm.toLowerCase();
@@ -120,34 +112,29 @@ const Admin = () => {
         order.storeName?.toLowerCase().includes(searchTermLower) ||
         order.ownerName?.toLowerCase().includes(searchTermLower) ||
         order.phone?.includes(searchTermLower) ||
-        // order.id.toLowerCase().includes(searchTermLower) || // Order ID search removed as per request
         (order.items && order.items.some(item => item.name.toLowerCase().includes(searchTermLower)))
       );
     });
     setFilteredOrders(filtered);
   }, [searchOrdersTerm, orders]);
 
-  // Effect to filter products based on search term
   useEffect(() => {
     const filtered = products.filter(product =>
       product.name.toLowerCase().includes(searchProductsTerm.toLowerCase()) ||
       product.category?.toLowerCase().includes(searchProductsTerm.toLowerCase())
     );
     setFilteredProducts(filtered);
-    // Update categories based on all products, not just filtered ones
     const uniqueCategories = [...new Set(products.map(p => p.category).filter(Boolean))];
     setCategories(uniqueCategories);
   }, [searchProductsTerm, products]);
 
-  // Handler for when a draggable item is dropped
   const handleDragEnd = useCallback(async (result) => {
-    if (!result.destination || !result.source) return; // Dropped outside a droppable area or no source
+    if (!result.destination || !result.source) return;
     if (result.destination.droppableId === result.source.droppableId &&
         result.destination.index === result.source.index) {
-      return; // Item dropped in the same place
+      return;
     }
 
-    // Reorder items in the filtered list for immediate UI update
     const reordered = Array.from(filteredProducts);
     const [movedItem] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, movedItem);
@@ -155,13 +142,11 @@ const Admin = () => {
     setFilteredProducts(reordered); 
   
     try {
-      // Update displayOrder for all products in the new order in Firestore
       const updatePromises = reordered.map((product, index) => 
         updateDoc(doc(db, 'products', product.id), { displayOrder: index })
       );
       await Promise.all(updatePromises);
       
-      // If not searching, update the main products list. Otherwise, refetch to ensure correct full order.
       if (!searchProductsTerm) {
         setProducts(reordered);
       } else {
@@ -171,21 +156,19 @@ const Admin = () => {
     } catch (error) {
       console.error("Error updating product order:", error);
       displayMessage("Failed to update product order.", "error");
-      await fetchProducts(); // Revert UI by refetching on error
+      await fetchProducts(); 
     }
-  }, [filteredProducts, fetchProducts, searchProductsTerm, products]); // Added products to dependency
+  }, [filteredProducts, fetchProducts, searchProductsTerm, products]);
   
 
-  // Handler for image file selection
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Create a preview URL
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  // Handler for product form submission (add/edit)
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!name || !price || (!category && !customCategory)) {
@@ -194,8 +177,8 @@ const Admin = () => {
     }
 
     try {
-      let imageUrl = editId ? products.find(p => p.id === editId)?.image || '' : ''; // Keep existing image if not changed
-      if (image) { // If a new image is selected
+      let imageUrl = editId ? products.find(p => p.id === editId)?.image || '' : '';
+      if (image) {
         const imageRef = ref(storage, `products/${Date.now()}_${image.name}`);
         await uploadBytes(imageRef, image);
         imageUrl = await getDownloadURL(imageRef);
@@ -216,25 +199,24 @@ const Admin = () => {
         featured,
       };
 
-      if (editId) { // Editing existing product
+      if (editId) {
         await updateDoc(doc(db, 'products', editId), productData);
         displayMessage('Product updated successfully!', 'success');
-      } else { // Adding new product
+      } else {
         productData.createdAt = serverTimestamp();
-        productData.displayOrder = products.length; // New items go to the end by default
+        productData.displayOrder = products.length; 
         await addDoc(collection(db, 'products'), productData);
         displayMessage('Product uploaded successfully!', 'success');
       }
 
-      clearForm(); // Reset form fields
-      fetchProducts(); // Refresh product list
+      clearForm();
+      fetchProducts(); 
     } catch (error) {
       console.error('Upload failed:', error);
       displayMessage(`Upload failed: ${error.message}`, 'error');
     }
   };
 
-  // Handler to populate form for editing a product
   const handleEdit = (product) => {
     setEditId(product.id);
     setName(product.name);
@@ -245,17 +227,16 @@ const Admin = () => {
     setFeatured(product.featured);
     setImage(null); 
     setImagePreview(product.image || null); 
-    setShowSection('add'); // Switch to the add/edit form section
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top for better UX
+    setShowSection('add');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handler to delete a product
   const handleDeleteProduct = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await deleteDoc(doc(db, 'products', id));
         displayMessage('Product deleted successfully!', 'success');
-        fetchProducts(); // Refresh product list
+        fetchProducts();
       } catch (error) {
         console.error("Error deleting product:", error);
         displayMessage(`Error deleting product: ${error.message}`, 'error');
@@ -263,29 +244,26 @@ const Admin = () => {
     }
   };
 
-  // Handler to toggle boolean fields (inStock, featured) for a product
   const toggleProductField = async (id, field, value) => {
     try {
       await updateDoc(doc(db, 'products', id), { [field]: value });
       displayMessage(`Product ${field} updated.`, 'success');
-      // Optimistically update local state for immediate UI feedback
       const updateState = (prevState) => prevState.map(p => p.id === id ? {...p, [field]: value} : p);
       setProducts(updateState);
       setFilteredProducts(updateState);
     } catch (error) {
       console.error(`Error toggling ${field}:`, error);
       displayMessage(`Error updating ${field}: ${error.message}`, 'error');
-      fetchProducts(); // Re-fetch on error to ensure data consistency
+      fetchProducts();
     }
   };
 
-  // Handler to delete an order
   const handleDeleteOrder = async (id) => {
     if (window.confirm("Are you sure you want to delete this order?")) {
       try {
         await deleteDoc(doc(db, 'orders', id));
         displayMessage('Order deleted successfully!', 'success');
-        fetchOrders(); // Refresh order list
+        fetchOrders();
       } catch (error) {
         console.error("Error deleting order:", error);
         displayMessage(`Error deleting order: ${error.message}`, 'error');
@@ -325,7 +303,6 @@ const Admin = () => {
           </div>
         )}
 
-        {/* Add/Edit Product Form Section */}
         {showSection === 'add' && (
           <>
             <h3 className={styles.formSectionTitle}>{editId ? 'Edit Product' : 'Add New Product'}</h3>
@@ -357,7 +334,6 @@ const Admin = () => {
           </>
         )}
 
-        {/* View Products Section */}
         {showSection === 'products' && (
           <div className={styles.searchAndTableContainer}>
             <h3 className={styles.formSectionTitle}>All Products</h3>
@@ -429,7 +405,6 @@ const Admin = () => {
           </div>
         )}
 
-        {/* View Orders Section */}
         {showSection === 'orders' && (
           <div className={styles.searchAndTableContainer}>
             <h3 className={styles.formSectionTitle}>Customer Orders</h3>
@@ -443,7 +418,6 @@ const Admin = () => {
             <div className={styles.itemsList}>
               {filteredOrders.length > 0 ? filteredOrders.map(order => (
                 <div key={order.id} className={styles.orderItemCard}>
-                  {/* <p><strong>Order ID:</strong> {order.id}</p> */} {/* Order ID display removed */}
                   <p><strong>Store Name:</strong> {order.storeName || order.name}</p>
                   <p><strong>Store Owner:</strong> {order.ownerName}</p>
                   <p><strong>Phone:</strong> {order.phone}</p>
