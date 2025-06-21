@@ -11,7 +11,8 @@ import Admin from './Admin';
 import ProtectedRoute from './ProtectedRoute';
 import CartIcon from './CartIcon';
 import { useTheme } from './ThemeContext';
-import { FaSun, FaMoon, FaTrash, FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa';
+// Added more icons for UI enhancements
+import { FaSun, FaMoon, FaTrash, FaBars, FaTimes, FaShoppingCart, FaCheck, FaSadTear } from 'react-icons/fa';
 
 import styles from './App.module.css';
 import homeStyles from './Home.module.css';
@@ -19,19 +20,38 @@ import cartStyles from './Cart.module.css';
 import checkoutStyles from './Checkout.module.css';
 import loginStyles from './Login.module.css';
 
-// NEW: Component to scroll window to top on route change
+// --- Reusable UI Components ---
+
+const SkeletonCard = () => (
+    <div className={homeStyles.skeletonCard}>
+        <div className={homeStyles.skeletonImage}></div>
+        <div className={homeStyles.skeletonText} style={{width: '80%'}}></div>
+        <div className={homeStyles.skeletonTextShort}></div>
+        <div className={homeStyles.skeletonButton}></div>
+    </div>
+);
+
+const EmptyState = ({ icon, message, buttonText, buttonLink }) => (
+    <div className={cartStyles.emptyStateContainer}>
+        <div className={cartStyles.emptyStateIcon}>{icon}</div>
+        <p className={cartStyles.emptyStateMessage}>{message}</p>
+        {buttonText && buttonLink && (
+            <Link to={buttonLink} className="btn btn-primary">
+                {buttonText}
+            </Link>
+        )}
+    </div>
+);
+
+
+// --- Core App Components ---
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
-  return null; // This component does not render anything
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
 };
 
-
-// --- Desktop Nav Component ---
 const DesktopNav = ({ user, theme, toggleTheme, cart, handleLogout }) => (
   <nav className={styles.appNav}>
     <div className={styles.navLinkGroup}>
@@ -45,108 +65,47 @@ const DesktopNav = ({ user, theme, toggleTheme, cart, handleLogout }) => (
       <Link to="/cart" className={styles.navButton}>
         <CartIcon cartCount={cart.reduce((sum, item) => sum + (item.quantity || 0), 0)} />
       </Link>
-      {!user ? (
-        <Link to="/login" className={styles.navButtonLink}>Admin Login</Link>
-      ) : (
-        <button onClick={handleLogout} className={styles.navButtonLink}>Logout</button>
-      )}
+      {!user ? ( <Link to="/login" className={styles.navButtonLink}>Admin Login</Link> ) : ( <button onClick={handleLogout} className={styles.navButtonLink}>Logout</button> )}
     </div>
   </nav>
 );
 
-// --- Mobile Nav Component ---
 const MobileNav = ({ user, theme, toggleTheme, cart, handleLogout, searchQuery, setSearchQuery }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-  
-  const NavLink = ({ to, children }) => (
-    <Link to={to} onClick={() => setIsMenuOpen(false)} className={styles.mobileMenuLink}>
-      {children}
-    </Link>
-  );
+  const toggleMenu = () => { setIsMenuOpen(!isMenuOpen); };
+  const NavLink = ({ to, children }) => ( <Link to={to} onClick={() => setIsMenuOpen(false)} className={styles.mobileMenuLink}> {children} </Link> );
 
   return (
     <div className={styles.mobileNavContainer}>
-      <div className={styles.topBar}>
-        Call or Text: (714) 362-6281
-      </div>
+      <div className={styles.topBar}> Call or Text: (714) 362-6281 </div>
       <div className={styles.mainMobileNav}>
-        <button onClick={toggleMenu} className={styles.hamburgerIcon} aria-label="Open menu">
-          <FaBars />
-        </button>
+        <button onClick={toggleMenu} className={styles.hamburgerIcon} aria-label="Open menu"><FaBars /></button>
         <Link to="/" className={styles.mobileLogo}>JM</Link>
         <div className={styles.mobileSearchWrapper}>
-          <input 
-            type="text"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={styles.mobileSearchInput}
-          />
+          <input type="text" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className={styles.mobileSearchInput}/>
         </div>
         <Link to="/cart" className={styles.mobileCartIcon} aria-label="View cart">
           <CartIcon cartCount={cart.reduce((sum, item) => sum + (item.quantity || 0), 0)} />
         </Link>
       </div>
-
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={toggleMenu}
-              className={styles.mobileMenuOverlay}
-            />
-            <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween", ease: "easeOut", duration: 0.3 }}
-              className={styles.mobileMenuContent}
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={toggleMenu} className={styles.mobileMenuOverlay}/>
+            <motion.div initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }} transition={{ type: "tween", ease: "easeOut", duration: 0.3 }} className={styles.mobileMenuContent}>
               <div className={styles.mobileMenuHeader}>
                 <h3>Menu</h3>
-                <button onClick={toggleMenu} className={styles.closeMenuButton} aria-label="Close menu">
-                  <FaTimes />
-                </button>
+                <button onClick={toggleMenu} className={styles.closeMenuButton} aria-label="Close menu"><FaTimes /></button>
               </div>
-              
               <NavLink to="/">Home</NavLink>
               <NavLink to="/cart">Cart</NavLink>
               {user && <NavLink to="/admin">Admin</NavLink>}
-
-              <button 
-                onClick={() => {
-                    toggleTheme();
-                    setIsMenuOpen(false); 
-                }} 
-                className={styles.mobileMenuLink} 
-                style={{
-                    background: 'none', 
-                    border: 'none', 
-                    padding: 0, 
-                    width: 'auto', 
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem'
-                }}
-              >
+              <button onClick={() => { toggleTheme(); setIsMenuOpen(false); }} className={styles.mobileMenuLink} style={{ background: 'none', border: 'none', padding: 0, width: 'auto', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span>Toggle Theme</span>
                 {theme === 'light' ? <FaMoon /> : <FaSun />}
               </button>
-
               <div className={styles.mobileMenuActions}>
-                {!user ? (
-                  <NavLink to="/login">Admin Login</NavLink>
-                ) : (
-                  <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); setIsMenuOpen(false); }} className={styles.mobileMenuLink}>Logout</a>
-                )}
+                {!user ? ( <NavLink to="/login">Admin Login</NavLink> ) : ( <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); setIsMenuOpen(false); }} className={styles.mobileMenuLink}>Logout</a> )}
               </div>
             </motion.div>
           </>
@@ -157,41 +116,22 @@ const MobileNav = ({ user, theme, toggleTheme, cart, handleLogout, searchQuery, 
 };
 
 
-// --- Home Component ---
-const Home = ({ addToCart, searchQuery, isMobile }) => {
+const Home = ({ addToCart, searchQuery, isMobile, setSearchQuery }) => { // Added setSearchQuery to props
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [quantities, setQuantities] = useState({}); 
   const [addedToCart, setAddedToCart] = useState({});
+  const [isLoading, setIsLoading] = useState(true); 
   const scrollRef = useRef(null);
   
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeftStart, setScrollLeftStart] = useState(0);
 
-  const handleMouseDown = useCallback((e) => {
-    if (!scrollRef.current) return;
-    setIsDragging(true);
-    setStartX((e.pageX || e.clientX) - scrollRef.current.offsetLeft);
-    setScrollLeftStart(scrollRef.current.scrollLeft);
-    scrollRef.current.style.cursor = 'grabbing';
-  }, []); 
-
-  const handleMouseLeaveOrUp = useCallback(() => {
-    if (scrollRef.current && isDragging) { 
-        scrollRef.current.style.cursor = 'grab';
-    }
-    setIsDragging(false);
-  }, [isDragging]); 
-
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || !scrollRef.current) return;
-    e.preventDefault();
-    const x = (e.pageX || e.clientX) - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5; 
-    scrollRef.current.scrollLeft = scrollLeftStart - walk;
-  }, [isDragging, startX, scrollLeftStart]);
+  const handleMouseDown = useCallback((e) => { if (!scrollRef.current) return; setIsDragging(true); setStartX((e.pageX || e.clientX) - scrollRef.current.offsetLeft); setScrollLeftStart(scrollRef.current.scrollLeft); scrollRef.current.style.cursor = 'grabbing'; }, []); 
+  const handleMouseLeaveOrUp = useCallback(() => { if (scrollRef.current && isDragging) { scrollRef.current.style.cursor = 'grab'; } setIsDragging(false); }, [isDragging]); 
+  const handleMouseMove = useCallback((e) => { if (!isDragging || !scrollRef.current) return; e.preventDefault(); const x = (e.pageX || e.clientX) - scrollRef.current.offsetLeft; const walk = (x - startX) * 1.5; scrollRef.current.scrollLeft = scrollLeftStart - walk; }, [isDragging, startX, scrollLeftStart]);
 
   useEffect(() => {
     const currentScrollRef = scrollRef.current;
@@ -214,6 +154,7 @@ const Home = ({ addToCart, searchQuery, isMobile }) => {
   
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoading(true); 
       try {
         const querySnapshot = await getDocs(collection(db, 'products'));
         const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -225,13 +166,12 @@ const Home = ({ addToCart, searchQuery, isMobile }) => {
         sorted.forEach(item => { initialQuantities[item.id] = '1'; });
         setQuantities(initialQuantities);
       } catch (error) { console.error("Error fetching products:", error); }
+      setIsLoading(false); 
     };
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    if (selectedCategory) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  }, [selectedCategory]);
+  useEffect(() => { if (selectedCategory) { window.scrollTo({ top: 0, behavior: 'smooth' }); } }, [selectedCategory]);
   
   const handleQuantityInputChange = (productId, rawValue) => { if (rawValue === '' || /^[1-9][0-9]*$/.test(rawValue)) { setQuantities(prev => ({ ...prev, [productId]: rawValue })); } else if (rawValue === '0' && quantities[productId] !== '0') { setQuantities(prev => ({ ...prev, [productId]: rawValue })); } };
   const handleQuantityInputBlur = (productId) => { const currentValue = quantities[productId]; const parsedValue = parseInt(currentValue); if (isNaN(parsedValue) || parsedValue < 1) { setQuantities(prev => ({ ...prev, [productId]: '1' })); } };
@@ -241,7 +181,7 @@ const Home = ({ addToCart, searchQuery, isMobile }) => {
     <motion.div key={p.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className={homeStyles.productCard}>
       {p.featured && <span className={homeStyles.badgeHot}>Hot Item</span>}
       {!p.inStock && <span className={homeStyles.badgeSoldOut}>Sold Out</span>}
-      {p.image ? ( <img src={p.image} alt={p.name} className={homeStyles.productImage} onError={(e) => e.target.style.display='none'}/> ) : ( <div className={homeStyles.imageFiller} /> )}
+      {p.image ? ( <img src={p.image} alt={p.name} className={homeStyles.productImage} loading="lazy" onError={(e) => e.target.style.display='none'}/> ) : ( <div className={homeStyles.imageFiller} /> )}
       <div className={homeStyles.productInfo}>
         <h3 className={homeStyles.productName}>{p.name}</h3>
         <p className={homeStyles.productPrice}>${p.price.toFixed(2)}</p>
@@ -250,15 +190,33 @@ const Home = ({ addToCart, searchQuery, isMobile }) => {
           <input type="number" value={quantities[p.id] === undefined ? '1' : quantities[p.id]} onChange={(e) => handleQuantityInputChange(p.id, e.target.value)} onBlur={() => handleQuantityInputBlur(p.id)} className={homeStyles.qtyInput} min="1" />
           <button onClick={() => adjustQuantity(p.id, 1)} className={homeStyles.qtyBtn}>+</button>
         </div>
-        <button onClick={() => { const quantityToAdd = Math.max(1, parseInt(quantities[p.id]) || 1); addToCart({ ...p, quantity: quantityToAdd }); setAddedToCart(prev => ({ ...prev, [p.id]: true })); if (String(quantities[p.id]) !== String(quantityToAdd)) { setQuantities(prev => ({ ...prev, [p.id]: String(quantityToAdd) })); } setTimeout(() => setAddedToCart(prev => ({ ...prev, [p.id]: false })), 2000); }} disabled={!p.inStock} className={`btn btn-primary ${homeStyles.addToCartButton}`}> {p.inStock ? 'Add to Cart' : 'Out of Stock'} </button>
-        {addedToCart[p.id] && ( <div className={homeStyles.addedToCartMessage}> Added to cart! </div> )}
+        <button
+          onClick={() => {
+            const quantityToAdd = Math.max(1, parseInt(quantities[p.id]) || 1);
+            addToCart({ ...p, quantity: quantityToAdd });
+            setAddedToCart(prev => ({ ...prev, [p.id]: true }));
+            if (String(quantities[p.id]) !== String(quantityToAdd)) {
+                 setQuantities(prev => ({ ...prev, [p.id]: String(quantityToAdd) }));
+            }
+            setTimeout(() => setAddedToCart(prev => ({ ...prev, [p.id]: false })), 1500);
+          }}
+          disabled={!p.inStock || addedToCart[p.id]}
+          className={`btn btn-primary ${homeStyles.addToCartButton} ${addedToCart[p.id] ? homeStyles.addedState : ''}`}
+        >
+          {!p.inStock 
+            ? 'Out of Stock' 
+            : addedToCart[p.id] 
+              ? <><FaCheck /> Added!</> 
+              : 'Add to Cart'
+          }
+        </button>
       </div>
     </motion.div>
   );
 
   const displayProducts = products.filter(p => {
     const matchCategory = selectedCategory ? p.category === selectedCategory : true;
-    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = searchQuery ? p.name.toLowerCase().includes(searchQuery.toLowerCase()) : true;
     return matchCategory && matchSearch;
   });
 
@@ -275,15 +233,23 @@ const Home = ({ addToCart, searchQuery, isMobile }) => {
 
   return (
     <div className={homeStyles.homeContainer}>
-      <div 
-        className={homeStyles.fixedHeaderPanel} 
-        ref={headerPanelRef}
-        style={{ top: isMobile ? '85px' : '60px' }}
-      >
+      <div className={homeStyles.fixedHeaderPanel} ref={headerPanelRef} style={{ top: isMobile ? '85px' : '60px' }}>
         <h1 className={homeStyles.headerTitle}>JM Distribution</h1>
+        {!isMobile && ( <p className={homeStyles.headerSubtitle}>Cell: (714) 362-6281</p> )}
+        
+        {/* UPDATED: Conditionally render search bar for desktop view */}
         {!isMobile && (
-          <p className={homeStyles.headerSubtitle}>Cell: (714) 362-6281</p>
+          <div className={homeStyles.searchContainer}>
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={homeStyles.searchInput} 
+            />
+          </div>
         )}
+
         <div className={homeStyles.categoryFilterContainerOuter}>
           <div ref={scrollRef} className={`${homeStyles.categoryFilterContainer} hide-scrollbar`}>
             <button onClick={() => setSelectedCategory('')} className={`${homeStyles.categoryButton} ${selectedCategory === '' ? homeStyles.categoryButtonActive : ''}`}>All</button>
@@ -294,27 +260,42 @@ const Home = ({ addToCart, searchQuery, isMobile }) => {
       </div>
       <div className={homeStyles.productsGridContainer} style={{ gridTemplateColumns: isMobile ? 'repeat(auto-fill, minmax(150px, 1fr))' : 'repeat(auto-fill, minmax(230px, 1fr))', marginTop: headerPanelHeight ? `${headerPanelHeight + 16}px` : '210px' }}>
         <AnimatePresence>
-          {displayProducts.length > 0 ? displayProducts.map(renderProductCard) : <p style={{textAlign: 'center', gridColumn: '1 / -1'}}>No products match your search.</p> }
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, index) => <SkeletonCard key={index} />)
+          ) : displayProducts.length > 0 ? (
+            displayProducts.map(renderProductCard)
+          ) : (
+            <div style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
+              <EmptyState
+                icon={<FaSadTear />}
+                message="No products found matching your search."
+              />
+            </div>
+          )}
         </AnimatePresence>
       </div>
     </div>
   );
 };
 
-// --- Cart Component (No changes needed) ---
 const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   return (
     <div className={`page-container ${cartStyles.cartContainer}`}>
       <h2 className={cartStyles.cartTitle}>Your Cart</h2>
       {cart.length === 0 ? (
-        <p className={cartStyles.emptyCartMessage}>Your cart is empty.</p>
+        <EmptyState 
+            icon={<FaShoppingCart />}
+            message="Your cart is currently empty."
+            buttonText="Continue Shopping"
+            buttonLink="/"
+        />
       ) : (
         <>
           <ul className={cartStyles.cartList}>
             {cart.map(item => (
               <li key={item.id} className={cartStyles.cartItem}>
-                {item.image && ( <img src={item.image} alt={item.name} className={cartStyles.cartItemImage} onError={(e) => e.target.style.display='none'}/> )}
+                {item.image && ( <img src={item.image} alt={item.name} className={cartStyles.cartItemImage} loading="lazy" onError={(e) => e.target.style.display='none'}/> )}
                 <div className={cartStyles.cartItemDetails}>
                   <strong className={cartStyles.cartItemName}>{item.name}</strong>
                   <div className={cartStyles.cartItemQuantityControls}>
@@ -338,7 +319,6 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
   );
 };
 
-// --- Checkout Component (UPDATED) ---
 const Checkout = ({ cart, clearCart }) => {
   const [storeName, setStoreName] = useState('');
   const [ownerName, setOwnerName] = useState('');
@@ -348,17 +328,14 @@ const Checkout = ({ cart, clearCart }) => {
   const [addressState, setAddressState] = useState(''); 
   const [zip, setZip] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission status
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (cart.length === 0) { alert("Cart is empty. Please add items to your cart before checking out."); return; }
-    
-    setIsSubmitting(true); // Disable button at the start
-
+    if (cart.length === 0) { alert("Cart is empty."); return; }
+    setIsSubmitting(true);
     const order = { storeName, ownerName, phone, address: `${street}, ${city}, ${addressState}, ${zip}`, items: cart.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image || null })), total: parseFloat(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)), createdAt: serverTimestamp() };
-    
     try {
       const emailJsPublicKey = '5YgacT8wW9cQ0ldnp'; 
       const emailParams = { store_name: storeName, owner_name: ownerName, phone, address: `${street}, ${city}, ${addressState}, ${zip}`, total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2), items: cart.map(item => `${item.name} x${item.quantity} - $${item.price.toFixed(2)}`).join('\n') };
@@ -368,12 +345,11 @@ const Checkout = ({ cart, clearCart }) => {
       clearCart();
     } catch (error) {
       console.error("Detailed order submission error:", error);
-      alert("There was a problem submitting your order. Please try again or contact support. Check console for details.");
+      alert("There was a problem submitting your order. Check console for details.");
     } finally {
-      setIsSubmitting(false); // Re-enable button on success or error
+      setIsSubmitting(false);
     }
   };
-
   if (submitted) {
     return (
       <div className={`page-container ${checkoutStyles.orderPlacedContainer}`}>
@@ -384,7 +360,6 @@ const Checkout = ({ cart, clearCart }) => {
       </div>
     );
   }
-
   return (
     <div className={`page-container ${checkoutStyles.checkoutPageContainer}`}>
       <h2 className={checkoutStyles.checkoutTitle}>Checkout</h2>
@@ -396,19 +371,14 @@ const Checkout = ({ cart, clearCart }) => {
         <input placeholder="City" value={city} onChange={e => setCity(e.target.value)} required className={`input-field ${checkoutStyles.checkoutInput}`} />
         <input placeholder="State" value={addressState} onChange={e => setAddressState(e.target.value)} required className={`input-field ${checkoutStyles.checkoutInput}`} />
         <input placeholder="Zip Code" value={zip} onChange={e => setZip(e.target.value)} required className={`input-field ${checkoutStyles.checkoutInput}`} />
-        <button 
-          type="submit" 
-          className={`btn btn-primary ${checkoutStyles.placeOrderButton}`} 
-          disabled={isSubmitting} // Disable button when submitting
-        >
-          {isSubmitting ? 'Placing Order...' : 'Place Order'} {/* Change text when submitting */}
+        <button type="submit" className={`btn btn-primary ${checkoutStyles.placeOrderButton}`} disabled={isSubmitting}>
+          {isSubmitting ? 'Placing Order...' : 'Place Order'}
         </button>
       </form>
     </div>
   );
 };
 
-// --- Login Component (No changes needed) ---
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -441,7 +411,6 @@ const Login = () => {
 };
 
 
-// --- Main App Component ---
 function App() {
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
@@ -484,10 +453,9 @@ function App() {
           handleLogout={handleLogout}
         />
       )}
-
       <main className={styles.mainContent}>
         <Routes>
-          <Route path="/" element={<Home addToCart={addToCart} searchQuery={searchQuery} isMobile={isMobile} />} />
+          <Route path="/" element={<Home addToCart={addToCart} searchQuery={searchQuery} isMobile={isMobile} setSearchQuery={setSearchQuery} />} />
           <Route path="/cart" element={<Cart cart={cart} removeFromCart={removeFromCart} updateCartQuantity={updateCartQuantity} />} />
           <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />

@@ -241,6 +241,16 @@
 .addToCartButton {
   margin-top: 0.5rem;
   width: 100%;
+  display: flex; /* Added for icon alignment */
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* NEW: Style for the button after an item has been added */
+.addedState {
+  background-color: var(--accent-secondary) !important; /* Use success green color */
+  border-color: var(--accent-secondary) !important;
 }
 
 .addToCartButton:disabled {
@@ -252,8 +262,63 @@
 }
 
 .addedToCartMessage {
-  color: var(--accent-secondary);
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: bold;
+  /* This can now be removed as feedback is on the button itself */
+  display: none;
+}
+
+
+/* --- NEW: Styles for Skeleton Loader --- */
+.skeletonCard {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-primary);
+  padding: 1rem;
+  border-radius: var(--border-radius-medium);
+  width: 100%;
+  max-width: 250px;
+  min-height: 380px; 
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+.skeletonElement {
+  background: linear-gradient(to right, 
+    var(--background-tertiary) 8%, 
+    var(--border-primary) 18%, 
+    var(--background-tertiary) 33%
+  );
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: var(--border-radius-small);
+}
+
+.skeletonImage {
+  composes: skeletonElement;
+  width: 100%;
+  height: 150px;
+  margin-bottom: 1rem;
+}
+
+.skeletonText {
+  composes: skeletonElement;
+  height: 20px;
+  margin-bottom: 0.75rem;
+}
+
+.skeletonTextShort {
+  composes: skeletonText;
+  width: 50%;
+  margin: 0 auto 1rem auto; /* Center shorter text lines */
+}
+
+.skeletonButton {
+  composes: skeletonElement;
+  height: 40px;
+  border-radius: var(--border-radius-round);
+  margin-top: auto; /* Push to bottom */
 }

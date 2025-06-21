@@ -1,6 +1,5 @@
 /* src/Cart.module.css */
 .cartContainer {
-  /* uses .page-container from global.css */
   background-color: var(--background-secondary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -16,9 +15,38 @@
 }
 
 .emptyCartMessage {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
+  /* This class is no longer used, replaced by EmptyState component */
+  display: none;
 }
+
+/* NEW: Style for the empty state container */
+.emptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  margin-top: 2rem;
+  background-color: var(--card-background);
+  border: 1px dashed var(--border-secondary);
+  border-radius: var(--border-radius-large);
+}
+
+.emptyStateIcon {
+  font-size: 3rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.emptyStateMessage {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+/* .emptyStateButton will use global .btn .btn-primary */
+
 
 .cartList {
   list-style: none;
@@ -67,7 +95,7 @@
 .quantityAdjustButton {
   width: 25px;
   height: 25px;
-  border-radius: 50%; 
+  border-radius: 50%;
   border: none;
   background-color: var(--accent-primary);
   color: var(--text-on-accent);
@@ -83,7 +111,7 @@
 
 .cartItemQuantity {
   font-size: 1rem;
-  min-width: 20px; 
+  min-width: 20px;
   text-align: center;
 }
 
@@ -92,8 +120,8 @@
   border: none;
   color: var(--accent-danger);
   cursor: pointer;
-  margin-left: 0.75rem; 
-  font-size: 1.1rem; 
+  margin-left: 0.75rem;
+  font-size: 1.1rem;
 }
 .removeButton:hover {
   filter: brightness(0.8);
@@ -114,13 +142,12 @@
 }
 
 .checkoutButton {
-  /* Base styles from global .btn .btn-primary will be applied in JS */
   margin-top: 1rem;
   width: 100%; 
   max-width: 300px; 
   display: block; 
   margin-left: auto;
   margin-right: auto;
-  font-size: 1rem; /* INCREASED FONT SIZE */
-  padding: 0.5rem 1rem; /* Adjusted padding for larger font */
+  font-size: 1.1rem;
+  padding: 0.6rem 1.2rem;
 }
