@@ -11,7 +11,6 @@ import Admin from './Admin';
 import ProtectedRoute from './ProtectedRoute';
 import CartIcon from './CartIcon';
 import { useTheme } from './ThemeContext';
-// Added more icons for UI enhancements
 import { FaSun, FaMoon, FaTrash, FaBars, FaTimes, FaShoppingCart, FaCheck, FaSadTear } from 'react-icons/fa';
 
 import styles from './App.module.css';
@@ -20,8 +19,21 @@ import cartStyles from './Cart.module.css';
 import checkoutStyles from './Checkout.module.css';
 import loginStyles from './Login.module.css';
 
-// --- Reusable UI Components ---
+// --- Reusable Hooks ---
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  return debouncedValue;
+}
 
+// --- Reusable UI Components ---
 const SkeletonCard = () => (
     <div className={homeStyles.skeletonCard}>
         <div className={homeStyles.skeletonImage}></div>
@@ -43,6 +55,86 @@ const EmptyState = ({ icon, message, buttonText, buttonLink }) => (
     </div>
 );
 
+// Search component with live suggestions
+const Search = ({ allProducts, onSearchChange, inputClassName, wrapperClassName }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
+    const wrapperRef = useRef(null);
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            onSearchChange(debouncedSearchTerm);
+            const filtered = allProducts.filter(p => 
+                p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            );
+            setSuggestions(filtered.slice(0, 5));
+            setShowSuggestions(true);
+        } else {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            onSearchChange('');
+        }
+    }, [debouncedSearchTerm, allProducts, onSearchChange]);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [wrapperRef]);
+    
+    const handleKeyDown = (e) => {
+        if (e.key === 'ArrowDown') {
+            setActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+        } else if (e.key === 'ArrowUp') {
+            setActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+        } else if (e.key === 'Enter' && activeIndex > -1) {
+            handleSuggestionClick(suggestions[activeIndex]);
+        } else if (e.key === 'Escape') {
+            setShowSuggestions(false);
+        }
+    };
+    
+    const handleSuggestionClick = (product) => {
+        setSearchTerm(product.name);
+        onSearchChange(product.name);
+        setShowSuggestions(false);
+    };
+
+    return (
+        <div className={wrapperClassName || styles.searchWrapper} ref={wrapperRef}>
+            <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => searchTerm && setShowSuggestions(true)}
+                onKeyDown={handleKeyDown}
+                className={inputClassName} 
+            />
+            {showSuggestions && suggestions.length > 0 && (
+                <ul className={styles.suggestionsList}>
+                    {suggestions.map((product, index) => (
+                        <li
+                            key={product.id}
+                            className={`${styles.suggestionItem} ${index === activeIndex ? styles.suggestionItemActive : ''}`}
+                            onClick={() => handleSuggestionClick(product)}
+                        >
+                            {product.name}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+};
+
 
 // --- Core App Components ---
 
@@ -52,6 +144,7 @@ const ScrollToTop = () => {
   return null;
 };
 
+// UPDATED: DesktopNav no longer contains search
 const DesktopNav = ({ user, theme, toggleTheme, cart, handleLogout }) => (
   <nav className={styles.appNav}>
     <div className={styles.navLinkGroup}>
@@ -70,7 +163,8 @@ const DesktopNav = ({ user, theme, toggleTheme, cart, handleLogout }) => (
   </nav>
 );
 
-const MobileNav = ({ user, theme, toggleTheme, cart, handleLogout, searchQuery, setSearchQuery }) => {
+// UPDATED: MobileNav uses the Search component
+const MobileNav = ({ user, theme, toggleTheme, cart, handleLogout, allProducts, onSearchChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => { setIsMenuOpen(!isMenuOpen); };
   const NavLink = ({ to, children }) => ( <Link to={to} onClick={() => setIsMenuOpen(false)} className={styles.mobileMenuLink}> {children} </Link> );
@@ -81,9 +175,11 @@ const MobileNav = ({ user, theme, toggleTheme, cart, handleLogout, searchQuery, 
       <div className={styles.mainMobileNav}>
         <button onClick={toggleMenu} className={styles.hamburgerIcon} aria-label="Open menu"><FaBars /></button>
         <Link to="/" className={styles.mobileLogo}>JM</Link>
-        <div className={styles.mobileSearchWrapper}>
-          <input type="text" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className={styles.mobileSearchInput}/>
-        </div>
+        <Search 
+            allProducts={allProducts} 
+            onSearchChange={onSearchChange} 
+            inputClassName={styles.mobileSearchInput}
+        />
         <Link to="/cart" className={styles.mobileCartIcon} aria-label="View cart">
           <CartIcon cartCount={cart.reduce((sum, item) => sum + (item.quantity || 0), 0)} />
         </Link>
@@ -116,7 +212,8 @@ const MobileNav = ({ user, theme, toggleTheme, cart, handleLogout, searchQuery, 
 };
 
 
-const Home = ({ addToCart, searchQuery, isMobile, setSearchQuery }) => { // Added setSearchQuery to props
+// UPDATED: Home component now renders the desktop search bar
+const Home = ({ addToCart, searchQuery, isMobile, allProducts, onSearchChange }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -203,12 +300,7 @@ const Home = ({ addToCart, searchQuery, isMobile, setSearchQuery }) => { // Adde
           disabled={!p.inStock || addedToCart[p.id]}
           className={`btn btn-primary ${homeStyles.addToCartButton} ${addedToCart[p.id] ? homeStyles.addedState : ''}`}
         >
-          {!p.inStock 
-            ? 'Out of Stock' 
-            : addedToCart[p.id] 
-              ? <><FaCheck /> Added!</> 
-              : 'Add to Cart'
-          }
+          {!p.inStock ? 'Out of Stock' : addedToCart[p.id] ? <><FaCheck /> Added!</> : 'Add to Cart'}
         </button>
       </div>
     </motion.div>
@@ -237,17 +329,14 @@ const Home = ({ addToCart, searchQuery, isMobile, setSearchQuery }) => { // Adde
         <h1 className={homeStyles.headerTitle}>JM Distribution</h1>
         {!isMobile && ( <p className={homeStyles.headerSubtitle}>Cell: (714) 362-6281</p> )}
         
-        {/* UPDATED: Conditionally render search bar for desktop view */}
+        {/* UPDATED: Conditionally render Search component for desktop view */}
         {!isMobile && (
-          <div className={homeStyles.searchContainer}>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={homeStyles.searchInput} 
+            <Search 
+                allProducts={allProducts}
+                onSearchChange={onSearchChange}
+                inputClassName={homeStyles.desktopSearchInput}
+                wrapperClassName={homeStyles.desktopSearchContainer}
             />
-          </div>
         )}
 
         <div className={homeStyles.categoryFilterContainerOuter}>
@@ -284,12 +373,7 @@ const Cart = ({ cart, removeFromCart, updateCartQuantity }) => {
     <div className={`page-container ${cartStyles.cartContainer}`}>
       <h2 className={cartStyles.cartTitle}>Your Cart</h2>
       {cart.length === 0 ? (
-        <EmptyState 
-            icon={<FaShoppingCart />}
-            message="Your cart is currently empty."
-            buttonText="Continue Shopping"
-            buttonLink="/"
-        />
+        <EmptyState icon={<FaShoppingCart />} message="Your cart is currently empty." buttonText="Continue Shopping" buttonLink="/"/>
       ) : (
         <>
           <ul className={cartStyles.cartList}>
@@ -412,16 +496,38 @@ const Login = () => {
 
 
 function App() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      const localData = localStorage.getItem('jm-cart');
+      return localData ? JSON.parse(localData) : [];
+    } catch (error) {
+      console.error("Could not parse cart data from localStorage", error);
+      return [];
+    }
+  });
   const [user, setUser] = useState(null);
   const { theme, toggleTheme } = useTheme(); 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [allProducts, setAllProducts] = useState([]);
+  const [finalSearchTerm, setFinalSearchTerm] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    localStorage.setItem('jm-cart', JSON.stringify(cart));
+  }, [cart]);
 
   useEffect(() => {
     const handleResize = () => { setIsMobile(window.innerWidth <= 768); };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      const querySnapshot = await getDocs(collection(db, 'products'));
+      const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAllProducts(items);
+    };
+    fetchAllProducts();
   }, []);
 
   const addToCart = (product) => { setCart(currentCart => { const exists = currentCart.find(item => item.id === product.id); if (exists) { return currentCart.map(item => item.id === product.id ? { ...item, quantity: (item.quantity || 0) + (product.quantity || 0) } : item ); } else { return [...currentCart, { ...product, quantity: product.quantity || 1 }]; } }); };
@@ -441,8 +547,8 @@ function App() {
           toggleTheme={toggleTheme} 
           cart={cart} 
           handleLogout={handleLogout}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+          allProducts={allProducts}
+          onSearchChange={setFinalSearchTerm}
         />
       ) : (
         <DesktopNav 
@@ -451,11 +557,12 @@ function App() {
           toggleTheme={toggleTheme} 
           cart={cart} 
           handleLogout={handleLogout}
+          // The desktop nav no longer needs search props
         />
       )}
       <main className={styles.mainContent}>
         <Routes>
-          <Route path="/" element={<Home addToCart={addToCart} searchQuery={searchQuery} isMobile={isMobile} setSearchQuery={setSearchQuery} />} />
+          <Route path="/" element={<Home addToCart={addToCart} searchQuery={finalSearchTerm} isMobile={isMobile} allProducts={allProducts} onSearchChange={setFinalSearchTerm} />} />
           <Route path="/cart" element={<Cart cart={cart} removeFromCart={removeFromCart} updateCartQuantity={updateCartQuantity} />} />
           <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />

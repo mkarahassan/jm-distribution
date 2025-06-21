@@ -86,18 +86,57 @@
 }
 
 .mainContent {
-  padding-top: 60px; /* Default for desktop */
+  padding-top: 60px; 
+}
+
+
+/* --- SHARED SEARCH STYLES (Used by both Desktop and Mobile) --- */
+/* Wrapper is needed to position the dropdown */
+.searchWrapper {
+    position: relative; 
+    flex-grow: 1; 
+    padding: 0 0.5rem;
+}
+
+/* Dropdown list for suggestions */
+.suggestionsList {
+    position: absolute;
+    top: 100%; 
+    left: 0;
+    right: 0;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-primary);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+    margin: 0 0.5rem;
+    padding: 0;
+    list-style: none;
+    z-index: 999;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.suggestionItem {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-primary);
+}
+.suggestionItem:last-child {
+    border-bottom: none;
+}
+
+.suggestionItem:hover, .suggestionItemActive {
+    background-color: var(--background-tertiary);
 }
 
 
 /* --- MOBILE STYLES (Applies when screen width <= 768px) --- */
 @media (max-width: 768px) {
   .appNav {
-    /* Hide the desktop nav on mobile */
     display: none;
   }
   .mainContent {
-    /* Set padding-top to the height of the mobile nav container */
     padding-top: 85px; 
   }
 
@@ -144,10 +183,7 @@
     text-decoration: none;
   }
 
-  .mobileSearchWrapper {
-    flex-grow: 1; 
-    padding: 0 0.5rem;
-  }
+  /* No change needed for .searchWrapper on mobile */
 
   .mobileSearchInput {
     width: 100%;
