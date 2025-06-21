@@ -35,7 +35,6 @@
   color: var(--text-secondary);
 }
 
-/* NEW: Wrapper for the desktop search input */
 .desktopSearchContainer {
   width: 100%;
   display: flex;
@@ -43,10 +42,9 @@
   margin-bottom: 1rem;
 }
 
-/* NEW: Styles for the search input on the desktop home page */
 .desktopSearchInput {
   width: 100%;
-  max-width: 450px; /* A good width for the page */
+  max-width: 450px;
   padding: 0.6rem 1.2rem;
   border-radius: var(--border-radius-round);
   border: 1px solid var(--input-border);
@@ -238,6 +236,16 @@
 .addToCartButton {
   margin-top: 0.5rem;
   width: 100%;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ADDED: Style for the button after an item has been added */
+.addedState {
+  background-color: var(--accent-secondary) !important; 
+  border-color: var(--accent-secondary) !important;
 }
 
 .addToCartButton:disabled {
@@ -248,9 +256,7 @@
   opacity: 0.7;
 }
 
+/* This is no longer used, but kept for reference */
 .addedToCartMessage {
-  color: var(--accent-secondary);
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: bold;
+  display: none;
 }
